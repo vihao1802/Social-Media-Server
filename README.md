@@ -22,67 +22,67 @@ Install the following NuGet packages required for the project.
 Add ASP.NET Core Scaffolding Tools:
 
 ```bash
-Copy code
+
 dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design 
 ```
 Add Entity Framework Core Design Package:
 ```bash
-Copy code
+
 dotnet add package Microsoft.EntityFrameworkCore.Design
 ```
 Add Entity Framework Core for SQL Server:
 
 ```bash
-Copy code
+
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 ```
 Add Entity Framework Core Tools:
 ```bash
-Copy code
+
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 ```
 Add Newtonsoft.Json package for JSON serialization support in MVC:
 
 ```bash
-Copy code
+
 dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson --version 3.0.0
 ```
 3. **Install Entity Framework CLI Tool**
 Install the global Entity Framework Core CLI tool to handle migrations and database updates:
 
 ```bash
-Copy code
+
 dotnet tool install --global dotnet-ef --version 8.*
 ```
 4. **Run Migrations and update changes to database**
 After setting up your database context and models, run the following command to create the initial migration:
 
 ```bash
-Copy code
+
 dotnet ef migrations add init
 ```
 Update the Database
 Apply the migration to the database:
 
 ```bash
-Copy code
+
 dotnet ef database update
 ```
 5. **Running and build the Application**
 To run the application, use:
 
 ```bash
-Copy code
+
 dotnet build
 ```
 
 ```bash
-Copy code
+
 dotnet run
 ```
 To watch for changes and automatically rebuild the application during development, use:
 
 ```bash
-Copy code
+
 dotnet watch run
 ```
