@@ -10,7 +10,7 @@ public class GroupMessenge
     public int GroupChatId { get; set; }
     public GroupChat groupChat { get; set; }
 
-    public int SenderId { get; set; }
+    public string SenderId { get; set; }
     public User Sender { get; set; }
 
     public int ReplyToId { get; set; }
