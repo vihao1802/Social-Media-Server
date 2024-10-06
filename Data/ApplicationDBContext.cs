@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+
 using SocialMediaServer.Models;
 
 namespace SocialMediaServer.Data;
-public class ApplicationDBContext : DbContext
+public class ApplicationDBContext : IdentityDbContext<User>
 {
     public ApplicationDBContext(DbContextOptions options) : base(options)
     {
@@ -11,20 +13,26 @@ public class ApplicationDBContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Login> Logins { get; set; }
     public DbSet<Relationship> Relationships { get; set; }
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<PostViewer> PostViewers { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<CommentReaction> CommentReactions { get; set; }
+    public DbSet<GroupChat> Groups { get; set; }
+    public DbSet<GroupMember> GroupMembers { get; set; }
+    public DbSet<GroupMessenge> GroupMessenges { get; set; }
+    public DbSet<Messenge> Messenges { get; set; }
+    public DbSet<MessengeMediaContent> MessengeMediaContents { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<User>()
         .Property(e => e.Gender)
         .HasConversion<Byte>()
         .HasColumnType("TINYINT");
 
-        modelBuilder.Entity<Login>()
-        .Property(e => e.Is_disabled)
-        .HasConversion<Byte>()
-        .HasColumnType("TINYINT");
         modelBuilder.Entity<PostViewer>()
         .Property(e => e.Liked)
         .HasConversion<Byte>()
@@ -129,5 +137,20 @@ public class ApplicationDBContext : DbContext
             .WithMany(u => u.MediaContents) // A User can receive many Messages
             .HasForeignKey(m => m.MessengeId) // The foreign key is UserId
             .OnDelete(DeleteBehavior.Cascade); // Allow cascading deletes
+
+        List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER"
+                },
+            };
+        modelBuilder.Entity<IdentityRole>().HasData(roles);
     }
 }
