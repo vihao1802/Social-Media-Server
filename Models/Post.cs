@@ -9,7 +9,7 @@ public class Post
     public bool Is_story { get; set; } = false;
     public DateTime Create_at { get; set; } = DateTime.Now;
 
-    public int CreatorId { get; set; }
+    public string CreatorId { get; set; }
     public User Creator { get; set; }
 
 
