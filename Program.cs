@@ -9,6 +9,7 @@ using SocialMediaServer.Repositories.Implementations;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Implementations;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,13 @@ builder.Services.AddIdentity<User, IdentityRole>(Options =>
     Options.Password.RequireUppercase = true;
     Options.Password.RequireNonAlphanumeric = true;
     Options.Password.RequiredLength = 8;
+
+    Options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(365 * 100);  // Lockout time duration
+    Options.Lockout.AllowedForNewUsers = true;
+
 })
-.AddEntityFrameworkStores<ApplicationDBContext>();
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -55,13 +61,19 @@ builder.Services.AddAuthentication(options =>
 });
 
 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,8 +85,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 
 
