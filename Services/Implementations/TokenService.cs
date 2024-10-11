@@ -39,11 +39,11 @@ namespace SocialMediaServer.Services.Implementations
                 Audience = _config["JWT:Audience"]
             };
 
-            var tokenHanlder = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
 
-            var token = tokenHanlder.CreateToken(tokenDescriptor);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return tokenHanlder.WriteToken(token);
+            return tokenHandler.WriteToken(token);
 
         }
     }
