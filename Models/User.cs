@@ -1,4 +1,5 @@
 
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace SocialMediaServer.Models
@@ -6,12 +7,15 @@ namespace SocialMediaServer.Models
     public class User : IdentityUser
     {
         public string? Profile_img { get; set; }
-        public string? Bio { get; set; } = string.Empty;
 
-        public DateTime Date_of_birth { get; set; }
+        [StringLength(100)]
+        public string? Bio { get; set; }
 
-        public DateTime Create_at { get; set; } = DateTime.Now;
+        public DateTime? Date_of_birth { get; set; }
+
+        public string? PhoneNumber { get; set; }
         public bool Gender { get; set; } = true;
+        public DateTime Create_at { get; set; } = DateTime.Now;
         public bool Is_disabled { get; set; } = false;
         public List<Relationship> SentRelationships { get; set; } = new List<Relationship>();
         public List<Relationship> ReceivedRelationships { get; set; } = new List<Relationship>();

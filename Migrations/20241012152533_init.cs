@@ -34,9 +34,10 @@ namespace SocialMediaServer.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Profile_img = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Create_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<byte>(type: "TINYINT", nullable: false),
+                    Create_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Is_disabled = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -46,7 +47,6 @@ namespace SocialMediaServer.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -244,8 +244,8 @@ namespace SocialMediaServer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Relationship_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Relationship_type = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     Create_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -464,8 +464,8 @@ namespace SocialMediaServer.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "43161468-0b6d-411f-907e-4b0c5b302d15", null, "Admin", "ADMIN" },
-                    { "fed2cee1-f92a-4b6d-93b3-134d40813a2e", null, "User", "USER" }
+                    { "bd4be22f-b176-42ab-bf5c-bf970f1554cd", null, "Admin", "ADMIN" },
+                    { "bf2ce92d-0ec3-4a33-8d0f-9f0c926213f0", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
