@@ -46,7 +46,7 @@ namespace SocialMediaServer.Repositories.Implementations
             // return usersQueryable;
         }
 
-        public async Task<User?> GetUserById(Guid id)
+        public async Task<User?> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             return user;

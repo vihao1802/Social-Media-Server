@@ -24,11 +24,13 @@ namespace SocialMediaServer.Controllers
     {
 
         private readonly IAuthService _AuthService;
+        private readonly IUserService _userService;
         private readonly ITokenService _tokenService;
-        public AuthController(IAuthService AuthService, ITokenService tokenService)
+        public AuthController(IAuthService AuthService, IUserService userService, ITokenService tokenService)
         {
             _AuthService = AuthService;
             _tokenService = tokenService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -46,6 +48,7 @@ namespace SocialMediaServer.Controllers
                 }
                 else
                 {
+
                     return Ok(new RegisterResponseDTO
                     {
                         Username = registerDto.UserName,

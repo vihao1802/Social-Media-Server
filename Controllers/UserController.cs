@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaServer.DTOs.Request;
 using SocialMediaServer.Services.Interfaces;
-using SocialMediaServer.Mappers;
 namespace SocialMediaServer.Controllers
 {
 
@@ -30,7 +26,7 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpGet("{user_id}")]
-        public async Task<IActionResult> GetUserById(Guid user_id)
+        public async Task<IActionResult> GetUserById(string user_id)
         {
             var user = await _userService.GetUserById(user_id);
             if (user == null)
@@ -41,10 +37,10 @@ namespace SocialMediaServer.Controllers
         [HttpGet("/me")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            if (User.Identity.IsAuthenticated)
+            var email = HttpContext.Items["Email"] as string;
+            if (email != null)
             {
-                var claims = User.Claims.Select(c => new { c.Type, c.Value });
-                var user = await _userService.GetUserByEmail(claims.FirstOrDefault(c => c.Type.Contains("emailaddress")).Value);
+                var user = await _userService.GetUserByEmail(email);
                 return Ok(user);
             }
             return Unauthorized("User is not logged in.");
@@ -89,7 +85,7 @@ namespace SocialMediaServer.Controllers
 
 
         [HttpDelete("/lock/{user_id}")]
-        public async Task<IActionResult> DeleteUser(Guid user_id)
+        public async Task<IActionResult> DeleteUser(string user_id)
         {
             var delete_result = await _userService.LockUser(user_id);
             if (delete_result == null)
@@ -102,7 +98,7 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPut("/unlock/{user_id}")]
-        public async Task<IActionResult> UnlockUser(Guid user_id)
+        public async Task<IActionResult> UnlockUser(string user_id)
         {
             var unlock_result = await _userService.UnLockUser(user_id);
 
