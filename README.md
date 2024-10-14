@@ -12,77 +12,53 @@ Ensure you have the following tools installed:
 ## Setup Instructions
 
 1. **Trust the HTTPS development certificate**  
-   Run the following command to trust the development certificate for secure HTTPS connections:
+Run the following command to trust the development certificate for secure HTTPS connections:
    ```bash
    dotnet dev-certs https --trust
    ```
-2. **Add Required NuGet Packages**
-Install the following NuGet packages required for the project.
+2. **Add Required NuGet Packages from csproj file**
+   ```bash
+   dotnet restore
+   ```
 
-Add ASP.NET Core Scaffolding Tools:
+Packages would be installed:
 
-```bash
-Copy code
-dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design 
-```
-Add Entity Framework Core Design Package:
-```bash
-Copy code
-dotnet add package Microsoft.EntityFrameworkCore.Design
-```
-Add Entity Framework Core for SQL Server:
+- [Microsoft.VisualStudio.Web.CodeGeneration.Design](https://www.nuget.org/packages/Microsoft.VisualStudio.Web.CodeGeneration.Design)
+- [Microsoft.EntityFrameworkCore.Design](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Design)
+- [Microsoft.EntityFrameworkCore.SqlServer](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.SqlServer)
+- [Microsoft.EntityFrameworkCore.Tools](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.Tools)
+- [Microsoft.AspNetCore.Mvc.NewtonsoftJson](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.NewtonsoftJson) --version 3.0.0
+- [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer) --version 8.0.8
+- [Microsoft.Extensions.Identity.Core](https://www.nuget.org/packages/Microsoft.Extensions.Identity.Core) --version 8.0.8
+- [Microsoft.AspNetCore.Identity.EntityFrameworkCore](https://www.nuget.org/packages/Microsoft.AspNetCore.Identity.EntityFrameworkCore) --version 8.0.8
 
-```bash
-Copy code
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-```
-Add Entity Framework Core Tools:
-```bash
-Copy code
-dotnet add package Microsoft.EntityFrameworkCore.Tools
-```
-Add Newtonsoft.Json package for JSON serialization support in MVC:
-
-```bash
-Copy code
-dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson --version 3.0.0
-```
 3. **Install Entity Framework CLI Tool**
-Install the global Entity Framework Core CLI tool to handle migrations and database updates:
+   Install the global Entity Framework Core CLI tool to handle migrations and database updates:
 
-```bash
-Copy code
-dotnet tool install --global dotnet-ef --version 8.*
-```
+   ```bash
+   dotnet tool install --global dotnet-ef --version 8.*
+   ```
 4. **Run Migrations and update changes to database**
-After setting up your database context and models, run the following command to create the initial migration:
-
-```bash
-Copy code
-dotnet ef migrations add init
-```
-Update the Database
-Apply the migration to the database:
-
-```bash
-Copy code
-dotnet ef database update
-```
+   ```bash
+   dotnet-ef migrations add [name_of_migration]
+   ```
+   Apply the migration to the database:
+   ```bash
+   dotnet-ef database update
+   ```
 5. **Running and build the Application**
-To run the application, use:
+   To watch for changes and automatically rebuild the application during development, use:
+   ```bash
+   dotnet watch run
+   ```
 
-```bash
-Copy code
-dotnet build
-```
+   
+   To run the application, use:
+   ```bash
+   dotnet build
+   ```
 
-```bash
-Copy code
-dotnet run
-```
-To watch for changes and automatically rebuild the application during development, use:
+   ```bash
+   dotnet run
+   ```
 
-```bash
-Copy code
-dotnet watch run
-```
