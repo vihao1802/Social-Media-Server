@@ -10,7 +10,7 @@ namespace SocialMediaServer.Repositories.Interfaces
     public interface IUserRepository
     {
         Task<List<User?>> GetAllUsers();
-        Task<User?> GetUserById(Guid id);
+        Task<User?> GetUserById(string id);
         Task<User?> GetUserByUsername(string username);
         Task<IdentityResult> UpdateUserInformation(User user);
         Task<IdentityResult> LockUser(User user);

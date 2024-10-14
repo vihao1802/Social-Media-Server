@@ -1,4 +1,5 @@
 
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace SocialMediaServer.Models
@@ -6,6 +7,8 @@ namespace SocialMediaServer.Models
     public class User : IdentityUser
     {
         public string? Profile_img { get; set; }
+
+        [StringLength(100)]
         public string? Bio { get; set; }
 
         public DateTime? Date_of_birth { get; set; }

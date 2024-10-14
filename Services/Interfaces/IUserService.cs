@@ -13,7 +13,7 @@ namespace SocialMediaServer.Services.Interfaces
     {
         Task<List<UserResponseDTO?>> GetAllUsers();
 
-        Task<UserResponseDTO?> GetUserById(Guid id);
+        Task<UserResponseDTO?> GetUserById(string id);
         Task<UserResponseDTO?> GetUserByUsername(string username);
         Task<UserResponseDTO?> GetUserByEmail(string email);
 
@@ -22,7 +22,7 @@ namespace SocialMediaServer.Services.Interfaces
 
         Task<IdentityResult?> UpdateUserInformation(UpdateUserDTO updateUserDTO);
 
-        Task<IdentityResult> LockUser(Guid id);
-        Task<IdentityResult> UnLockUser(Guid id);
+        Task<IdentityResult> LockUser(string id);
+        Task<IdentityResult> UnLockUser(string id);
     }
 }

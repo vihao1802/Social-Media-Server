@@ -19,7 +19,7 @@ namespace SocialMediaServer.Services.Implementations
             _authRepository = authRepository;
         }
 
-        public async Task<IdentityResult?> LockUser(Guid id)
+        public async Task<IdentityResult?> LockUser(string id)
         {
             var user = await _userRepository.GetUserById(id);
             if (user == null)
@@ -29,7 +29,7 @@ namespace SocialMediaServer.Services.Implementations
             return result;
         }
 
-        public async Task<IdentityResult?> UnLockUser(Guid id)
+        public async Task<IdentityResult?> UnLockUser(string id)
         {
             var user = await _userRepository.GetUserById(id);
             if (user == null)
@@ -46,7 +46,7 @@ namespace SocialMediaServer.Services.Implementations
             return ListUsersDto;
         }
 
-        public async Task<UserResponseDTO?> GetUserById(Guid id)
+        public async Task<UserResponseDTO?> GetUserById(string id)
         {
             var user = await _userRepository.GetUserById(id);
             return user?.UserToUserResponseDTO();
@@ -73,7 +73,7 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<IdentityResult?> UpdateUserInformation(UpdateUserDTO updateUserDTO)
         {
-            var user = await _userRepository.GetUserById(updateUserDTO.Id);
+            var user = await _userRepository.GetUserById(updateUserDTO.Id.ToString());
             if (user == null)
                 return null;
 

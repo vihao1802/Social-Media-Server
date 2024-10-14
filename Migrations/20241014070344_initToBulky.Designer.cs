@@ -12,8 +12,8 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241005135751_init")]
-    partial class init
+    [Migration("20241014070344_initToBulky")]
+    partial class initToBulky
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "43161468-0b6d-411f-907e-4b0c5b302d15",
+                            Id = "39875189-8e19-45b4-a52a-5372721e963d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "fed2cee1-f92a-4b6d-93b3-134d40813a2e",
+                            Id = "0c83d767-5c0d-49bd-9c4b-77ef50659bd7",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -496,17 +496,15 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Relationship_type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Relationship_type")
+                        .HasColumnType("int");
 
                     b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -526,7 +524,8 @@ namespace SocialMediaServer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -535,7 +534,7 @@ namespace SocialMediaServer.Migrations
                     b.Property<DateTime>("Create_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date_of_birth")
+                    b.Property<DateTime?>("Date_of_birth")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
