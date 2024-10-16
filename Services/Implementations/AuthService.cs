@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using SocialMediaServer.DTOs;
 using SocialMediaServer.DTOs.Request;
 using SocialMediaServer.DTOs.Response;
+using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
@@ -40,18 +41,18 @@ namespace SocialMediaServer.Services.Implementations
             return login_result;
         }
 
-        public async Task<IdentityResult> Register(RegisterDTO registerDto)
+        public async Task Register(RegisterDTO registerDto)
         {
             if (!Validate.IsEmailValid(registerDto.Email))
-                return IdentityResult.Failed(new IdentityError { Description = "Email is invalid" });
+                throw new AppError("Invalid email", 400);
 
             var user = await _AuthRepository.GetUserByEmail(registerDto.Email);
             if (user != null)
-                return IdentityResult.Failed(new IdentityError { Description = "Email existed!" });
+                throw new AppError("Email existed", 400);
 
             var user_by_username = await _UserRepository.GetUserByUsername(registerDto.UserName);
             if (user_by_username != null)
-                return IdentityResult.Failed(new IdentityError { Description = "Username existed!" });
+                throw new AppError("Username existed", 500);
 
             var newUser = new User
             {
@@ -60,8 +61,13 @@ namespace SocialMediaServer.Services.Implementations
                 Date_of_birth = registerDto.Date_of_birth,
                 Gender = registerDto.Gender,
             };
+
             var created_user_result = await _AuthRepository.Register(newUser, registerDto.Password);
-            return created_user_result;
+
+            if (!created_user_result.Succeeded)
+                throw new AppError("Register failed", 500);
+
+            return;
         }
 
         public async Task<IdentityResult> Logout()

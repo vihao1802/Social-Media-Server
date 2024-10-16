@@ -5,6 +5,8 @@ using SocialMediaServer.DTOs.Request;
 using Microsoft.AspNetCore.Identity;
 using SocialMediaServer.Models;
 using SocialMediaServer.Services.Interfaces;
+using System.Security.Claims;
+using SocialMediaServer.ExceptionHandling;
 
 namespace SocialMediaServer.Services.Implementations
 {
@@ -52,6 +54,19 @@ namespace SocialMediaServer.Services.Implementations
             return user?.UserToUserResponseDTO();
         }
 
+        public async Task<UserResponseDTO> GetCurrentUser(ClaimsPrincipal principal)
+        {
+            if (principal != null)
+            {
+                var user = await _userRepository.GetUserByClaimPrincipal(principal);
+                return user?.UserToUserResponseDTO() ?? throw new AppError("Unauthorized !", 401);
+            }
+
+            throw new AppError("User not found", 404);
+        }
+
+
+
         public async Task<UserResponseDTO?> GetUserByUsername(string username)
         {
             var user = await _userRepository.GetUserByUsername(username);
@@ -64,26 +79,22 @@ namespace SocialMediaServer.Services.Implementations
             return user?.UserToUserResponseDTO();
         }
 
-
-
         public Task<List<UserResponseDTO>> SearchForUsers(string search_string)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IdentityResult?> UpdateUserInformation(UpdateUserDTO updateUserDTO)
+        public async Task UpdateUserInformation(string userId, UpdateUserDTO updateUserDTO)
         {
-            var user = await _userRepository.GetUserById(updateUserDTO.Id.ToString());
-            if (user == null)
-                return null;
+            var user = await _userRepository.GetUserById(userId);
 
             var check_unique_email = await GetUserByEmail(updateUserDTO.Email);
-            if (check_unique_email != null && !check_unique_email.Id.Equals(updateUserDTO.Id))
-                return IdentityResult.Failed(new IdentityError { Code = "Email", Description = "Email already exists!" });
+            if (check_unique_email != null && !check_unique_email.Id.Equals(userId))
+                throw new AppError("Email already exists!", 400);
 
             var check_unique_username = await GetUserByUsername(updateUserDTO.Username);
-            if (check_unique_username != null && !check_unique_username.Id.Equals(updateUserDTO.Id))
-                return IdentityResult.Failed(new IdentityError { Code = "Username", Description = "Username already exists!" });
+            if (check_unique_username != null && !check_unique_username.Id.Equals(userId))
+                throw new AppError("Username already exists!", 400);
 
             user.UserName = updateUserDTO.Username;
             user.Email = updateUserDTO.Email;
@@ -93,9 +104,9 @@ namespace SocialMediaServer.Services.Implementations
             user.Profile_img = updateUserDTO.Profile_img;
             user.Gender = updateUserDTO.Gender;
 
-            var update_result = await _userRepository.UpdateUserInformation(user);
+            await _userRepository.UpdateUserInformation(user);
 
-            return update_result;
+            return;
         }
     }
 }

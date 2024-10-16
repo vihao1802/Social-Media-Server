@@ -32,25 +32,18 @@ namespace SocialMediaServer.Repositories.Implementations
 
         }
 
-        public async Task<Relationship> FollowUser(Relationship relationship)
-        {
-            var r = await _dbContext.Relationships.AddAsync(relationship);
-            await _dbContext.SaveChangesAsync();
-            return r.Entity;
-        }
-
-        public Task UnfollowUser(Relationship relationship)
+        public async Task DeleteRelationship(Relationship relationship)
         {
             _dbContext.Relationships.Remove(relationship);
-            _dbContext.SaveChanges();
-            return Task.CompletedTask;
+            await _dbContext.SaveChangesAsync();
+            return;
         }
 
         public async Task<List<Relationship>> GetUserFollowing(string user_id)
         {
             var list_following = await _dbContext.Relationships
             .Include(r => r.Receiver)
-            .Where(r => r.Sender.Id.Equals(user_id))
+            .Where(r => r.Sender.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow)
             .ToListAsync();
 
             return list_following;
@@ -60,10 +53,34 @@ namespace SocialMediaServer.Repositories.Implementations
         {
             var list_following = await _dbContext.Relationships
             .Include(r => r.Sender)
-            .Where(r => r.Receiver.Id.Equals(user_id))
+            .Where(r => r.Receiver.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow)
             .ToListAsync();
 
             return list_following;
         }
+
+        public async Task<List<Relationship>> GetUserBlockList(string user_id)
+        {
+            var block_list = await _dbContext.Relationships
+            .Include(r => r.Receiver)
+            .Where(r => r.Sender.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Block)
+            .ToListAsync();
+
+            return block_list;
+        }
+
+        public async Task ChangeRelationshipType(Relationship r)
+        {
+            _dbContext.Relationships.Update(r);
+            await _dbContext.SaveChangesAsync();
+
+        }
+        public async Task<Relationship> CreateRelationship(Relationship relationship)
+        {
+            var r = await _dbContext.Relationships.AddAsync(relationship);
+            await _dbContext.SaveChangesAsync();
+            return r.Entity;
+        }
+
     }
 }

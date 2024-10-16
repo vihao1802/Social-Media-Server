@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
 using SocialMediaServer.Services.Interfaces;
 
@@ -22,11 +23,13 @@ namespace SocialMediaServer.Services.Implementations
             _config = config;
             _key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]));
         }
-        public string CreateToken(LoginDTO loginDto)
+        public string CreateToken(UserResponseDTO userResponseDTO)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Email, loginDto.Email),
+                new Claim(JwtRegisteredClaimNames.NameId, userResponseDTO.Id),
+                new Claim(JwtRegisteredClaimNames.UniqueName, userResponseDTO.Username),
+                new Claim(JwtRegisteredClaimNames.Email, userResponseDTO.Email),
             };
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 

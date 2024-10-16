@@ -16,9 +16,9 @@ namespace SocialMediaServer.Services.Interfaces
         Task UnFollowUser(string sender_id, string receiver_id);
 
         Task<List<FollowerResponseDTO>?> GetUserFollower(string user_id);
-
-        Task<IdentityResult> BlockUser(string sender_id, string receiver_id);
-        Task<IdentityResult> UnBlockUser(string sender_id, string receiver_id);
+        Task<List<FollowingResponseDTO>?> GetUserBlockList(string user_id);
+        Task BlockUser(string sender_id, string receiver_id);
+        Task UnBlockUser(string sender_id, string receiver_id);
 
 
     }

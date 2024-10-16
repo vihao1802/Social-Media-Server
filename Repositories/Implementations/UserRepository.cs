@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,19 @@ namespace SocialMediaServer.Repositories.Implementations
         {
             var update_result = await _userManager.UpdateAsync(user);
             return update_result;
+        }
+
+        public async Task<User?> GetUserByClaimPrincipal(ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            return user;
+        }
+
+        public async Task<IList<string>> GetUsersRoles(User user)
+        {
+            IList<string> roles = await _userManager.GetRolesAsync(user);
+
+            return roles;
         }
     }
 }

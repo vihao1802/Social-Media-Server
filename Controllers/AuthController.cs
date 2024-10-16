@@ -13,27 +13,22 @@ using NuGet.Protocol.Core.Types;
 using SocialMediaServer.DTOs;
 using SocialMediaServer.DTOs.Request;
 using SocialMediaServer.DTOs.Response;
+using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Services.Interfaces;
 
 namespace SocialMediaServer.Controllers
 {
-    [Route("auth/register")]
+    [Route("auth")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService AuthService, IUserService userService, ITokenService tokenService) : ControllerBase
     {
 
-        private readonly IAuthService _AuthService;
-        private readonly IUserService _userService;
-        private readonly ITokenService _tokenService;
-        public AuthController(IAuthService AuthService, IUserService userService, ITokenService tokenService)
-        {
-            _AuthService = AuthService;
-            _tokenService = tokenService;
-            _userService = userService;
-        }
+        private readonly IAuthService _AuthService = AuthService;
+        private readonly IUserService _userService = userService;
+        private readonly ITokenService _tokenService = tokenService;
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
             try
@@ -41,21 +36,14 @@ namespace SocialMediaServer.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var result = await _AuthService.Register(registerDto);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(result.Errors.FirstOrDefault()?.Description);
-                }
-                else
-                {
+                await _AuthService.Register(registerDto);
 
-                    return Ok(new RegisterResponseDTO
-                    {
-                        Username = registerDto.UserName,
-                        Email = registerDto.Email,
-                        Date_of_birth = registerDto.Date_of_birth
-                    });
-                }
+                return Ok(new RegisterResponseDTO
+                {
+                    Username = registerDto.UserName,
+                    Email = registerDto.Email,
+                    Date_of_birth = registerDto.Date_of_birth
+                });
             }
             catch (System.Exception ex)
             {
@@ -63,7 +51,7 @@ namespace SocialMediaServer.Controllers
             }
         }
 
-        [HttpPost("/auth/login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
             if (!ModelState.IsValid)
@@ -79,10 +67,11 @@ namespace SocialMediaServer.Controllers
             }
             else if (login_result.Succeeded)
             {
+                var new_user = await _userService.GetUserByEmail(loginDto.Email);
                 return Ok(new LoginResponseDTO
                 {
                     Email = loginDto.Email,
-                    Token = _tokenService.CreateToken(loginDto)
+                    Token = _tokenService.CreateToken(new_user)
                 });
             }
             else
@@ -91,7 +80,7 @@ namespace SocialMediaServer.Controllers
             }
 
         }
-        [HttpPost("/auth/logout")]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try
@@ -106,7 +95,7 @@ namespace SocialMediaServer.Controllers
 
         }
 
-        [HttpPost("/auth/forgot-password")]
+        [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO fotgotpasswordDto)
         {
             if (!ModelState.IsValid)
@@ -134,7 +123,7 @@ namespace SocialMediaServer.Controllers
 
         }
 
-        [HttpPost("/auth/reset-password")]
+        [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
         {
             if (!ModelState.IsValid)
@@ -161,7 +150,7 @@ namespace SocialMediaServer.Controllers
             }
         }
 
-        [HttpPost("/auth/update-password")]
+        [HttpPost("update-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDto)
         {
             if (!ModelState.IsValid)
@@ -190,7 +179,7 @@ namespace SocialMediaServer.Controllers
 
                 throw;
             }
-
         }
+
     }
 }
