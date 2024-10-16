@@ -50,18 +50,17 @@ namespace SocialMediaServer.Repositories.Implementations
             return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> Register(User newUser, string password)
+        public async Task<IdentityResult> Register(User newUser, string password)
         {
-            try
+            var created_user = await _userManager.CreateAsync(newUser, password);
+
+            if (created_user.Succeeded)
             {
-                var created_user = _userManager.CreateAsync(newUser, password);
+                await _userManager.AddToRoleAsync(newUser, "User");
+
                 return created_user;
             }
-            catch (System.Exception)
-            {
-
-                throw;
-            }
+            return IdentityResult.Failed(new IdentityError { Description = "Register failed!" });
         }
 
         public async Task<IdentityResult> ResetPassword(User user, string resetToken, string newPassword)
@@ -91,8 +90,8 @@ namespace SocialMediaServer.Repositories.Implementations
 
         public async Task<bool> CheckLockedOut(User user)
         {
-            var check_result = _userManager.IsLockedOutAsync(user);
-            return check_result.Result;
+            var check_result = await _userManager.IsLockedOutAsync(user);
+            return check_result;
         }
     }
 }
