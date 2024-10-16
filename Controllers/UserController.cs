@@ -1,7 +1,9 @@
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Services.Interfaces;
 namespace SocialMediaServer.Controllers
 {
@@ -10,15 +12,12 @@ namespace SocialMediaServer.Controllers
     [Authorize]
     [Route("api/user")]
 
-    public class UserController : ControllerBase
+    public class UserController(IUserService userService) : ControllerBase
     {
-        private readonly IUserService _userService;
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
+        private readonly IUserService _userService = userService;
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUser()
         {
             var users = await _userService.GetAllUsers();
@@ -34,36 +33,12 @@ namespace SocialMediaServer.Controllers
             return Ok(user);
         }
 
-        [HttpGet("/me")]
+        [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var email = HttpContext.Items["Email"] as string;
-            if (email != null)
-            {
-                var user = await _userService.GetUserByEmail(email);
-                return Ok(user);
-            }
-            return Unauthorized("User is not logged in.");
-        }
+            var current_user = await _userService.GetCurrentUser(User);
 
-
-        [HttpGet(":username")]
-        public async Task<IActionResult> GetUserByUsername([FromQuery] string username)
-        {
-            var user = await _userService.GetUserByUsername(username);
-            if (user == null)
-                return NotFound();
-            return Ok(user);
-        }
-
-
-        [HttpGet(":email")]
-        public async Task<IActionResult> GetUserByEmail([FromQuery] string email)
-        {
-            var user = await _userService.GetUserByEmail(email);
-            if (user == null)
-                return NotFound();
-            return Ok(user);
+            return Ok(current_user);
         }
 
         [HttpPut]
@@ -72,20 +47,17 @@ namespace SocialMediaServer.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var update_result = await _userService.UpdateUserInformation(updateUserDTO);
+            var current_user = await _userService.GetCurrentUser(User);
 
-            if (update_result == null)
-                return BadRequest("User not found!");
-
-            if (!update_result.Succeeded)
-                return BadRequest($"{update_result.Errors.FirstOrDefault()?.Description}");
+            await _userService.UpdateUserInformation(current_user.Id, updateUserDTO);
 
             return NoContent();
         }
 
 
         [HttpDelete("/lock/{user_id}")]
-        public async Task<IActionResult> DeleteUser(string user_id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> LockUser(string user_id)
         {
             var delete_result = await _userService.LockUser(user_id);
             if (delete_result == null)
@@ -96,8 +68,8 @@ namespace SocialMediaServer.Controllers
             else
                 return NoContent();
         }
-
         [HttpPut("/unlock/{user_id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UnlockUser(string user_id)
         {
             var unlock_result = await _userService.UnLockUser(user_id);
