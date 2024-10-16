@@ -10,8 +10,10 @@ namespace SocialMediaServer.Repositories.Interfaces
     {
         Task<List<Relationship>> GetUserFollowing(string user_id);
         Task<List<Relationship>> GetUserFollower(string user_id);
-        Task<Relationship> FollowUser(Relationship relationship);
-        Task UnfollowUser(Relationship relationship);
+        Task<List<Relationship>> GetUserBlockList(string user_id);
+        Task<Relationship> CreateRelationship(Relationship relationship);
+        Task DeleteRelationship(Relationship relationship);
         Task<Relationship> GetRelationshipBetweenSenderAndReceiver(string sender_id, string receiver_id);
+        Task ChangeRelationshipType(Relationship r);
     }
 }
