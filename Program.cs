@@ -73,6 +73,9 @@ builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
+
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -97,8 +100,6 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 
 app.UseAuthentication();
-
-app.UseMiddleware<EmailExtractMiddleware>();
 
 app.UseAuthorization();
 
