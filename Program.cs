@@ -14,7 +14,29 @@ using SocialMediaServer.Services.Implementations;
 using SocialMediaServer.Services.Interfaces;
 using SocialMediaServer.Utils;
 
+using CloudinaryDotNet;
+using DotNetEnv;
+using SocialMediaServer.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Load environment variables from .env file
+Env.Load();
+
+// Configure Cloudinary settings
+var cloudinarySettings = new CloudinarySettings
+{
+    CloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? throw new ArgumentException("CLOUDINARY_CLOUD_NAME is missing."),
+    ApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY") ?? throw new ArgumentException("CLOUDINARY_API_KEY is missing."),
+    ApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? throw new ArgumentException("CLOUDINARY_API_SECRET is missing.")
+
+};
+
+
+// Register Cloudinary as a singleton service
+var cloudinaryAccount = new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret);
+var cloudinary = new Cloudinary(cloudinaryAccount);
+builder.Services.AddSingleton(cloudinary);
 
 
 
@@ -75,6 +97,11 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IPostViewerRepository, PostViewerRepository>();
+builder.Services.AddScoped<IPostViewerService, PostViewerService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<IMediaContentRepository, MediaContentRepository>();
+builder.Services.AddScoped<IMediaContentService, MediaContentService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {

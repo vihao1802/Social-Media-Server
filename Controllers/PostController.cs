@@ -52,15 +52,18 @@ namespace SocialMediaServer.Controllers
 
         [Authorize(Roles = "User")]           
         [HttpPost]
-        public async Task<IActionResult> CreatePost([FromBody] PostCreateDTO postCreateDTO)
+        public async Task<IActionResult> CreatePost(
+            [FromBody] PostCreateDTO postCreateDTO)
         {
             var createdPost = await _postService.CreateAsync(postCreateDTO);
 
-            return CreatedAtAction(nameof(GetPostById), new { post_id = createdPost.Id }, createdPost);
+            return CreatedAtAction(nameof(GetPostById), 
+                new { post_id = createdPost.Id }, createdPost);
         }
 
         [HttpPut("{post_id}")]
-        public async Task<IActionResult> UpdatePost([FromBody] PostUpdateDTO post, int post_id)
+        public async Task<IActionResult> UpdatePost(
+            [FromBody] PostUpdateDTO post, int post_id)
         {
             try
             {
@@ -88,7 +91,8 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPatch("{post_id}")]
-        public async Task<IActionResult> PatchPost([FromBody] PostPatchDTO post, int post_id)
+        public async Task<IActionResult> PatchPost(
+            [FromBody] PostPatchDTO post, int post_id)
         {
             try
             {
