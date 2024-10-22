@@ -16,6 +16,7 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<Relationship> Relationships { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<PostViewer> PostViewers { get; set; }
+    public DbSet<MediaContent> MediaContents { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<CommentReaction> CommentReactions { get; set; }
     public DbSet<GroupChat> Groups { get; set; }
