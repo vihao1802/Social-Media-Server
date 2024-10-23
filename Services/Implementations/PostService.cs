@@ -121,6 +121,8 @@ namespace SocialMediaServer.Services.Implementations
 
             if (post == null)
                 throw new AppError("Post not found!", 404);
+            
+            await CheckPermissionAsync(post.CreatorId);
 
             return await _postRepository.DeleteAsync(id);
         }
@@ -128,10 +130,13 @@ namespace SocialMediaServer.Services.Implementations
         public async Task<PostResponseDTO> UpdateAsync(PostUpdateDTO post, int id)
         {
             var postToUpdate = await _postRepository.GetByIdAsync(id);
-            var user = await _userRepository.GetUserById(post.CreatorId);
 
             if (postToUpdate == null)
                 throw new AppError("Post not found!", 404);
+
+            await CheckPermissionAsync(postToUpdate.CreatorId);
+
+            var user = await _userRepository.GetUserById(post.CreatorId);
 
             if (user == null)
                 throw new AppError("User not found!", 404);
@@ -152,6 +157,8 @@ namespace SocialMediaServer.Services.Implementations
 
             if (postToUpdate == null)
                 throw new AppError("Post not found!", 404);
+
+            await CheckPermissionAsync(postToUpdate.CreatorId);
 
             if (post.CreatorId != null)
             {
@@ -176,5 +183,26 @@ namespace SocialMediaServer.Services.Implementations
             return updatedPost.PostToPostResponseDTO();
         }
 
+        private async Task<User> GetCurrentUserAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                throw new AppError("You are not authorized", 401);
+
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new AppError("User login not found", 404);
+
+            return user;
+        }
+
+        private async Task CheckPermissionAsync(string creatorId)
+        {
+            var user = await GetCurrentUserAsync();
+            var roles = await _userRepository.GetUsersRoles(user);
+
+            if (creatorId != user.Id && !roles.Contains("Admin"))
+                throw new AppError("You do not have permission to perform this action", 401);
+        }
     }
 }
