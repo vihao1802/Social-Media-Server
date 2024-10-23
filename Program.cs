@@ -102,6 +102,8 @@ builder.Services.AddScoped<IPostViewerService, PostViewerService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IMediaContentRepository, MediaContentRepository>();
 builder.Services.AddScoped<IMediaContentService, MediaContentService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
