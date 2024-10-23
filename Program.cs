@@ -98,8 +98,6 @@ app.UseExceptionHandler();
 
 app.UseAuthentication();
 
-app.UseMiddleware<EmailExtractMiddleware>();
-
 app.UseAuthorization();
 
 
