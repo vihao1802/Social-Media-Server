@@ -52,7 +52,6 @@ namespace SocialMediaServer.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {

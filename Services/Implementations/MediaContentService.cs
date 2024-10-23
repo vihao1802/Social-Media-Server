@@ -2,6 +2,7 @@
 using SocialMediaServer.DTOs.Request.MediaContent;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
+using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
 using System.Security.Claims;
@@ -45,7 +46,8 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<MediaContentResponseDTO> GetByIdAsync(int id)
         {
-            var mediaContent = await _mediaContentRepository.GetByIdAsync(id);
+            var mediaContent = await _mediaContentRepository.GetByIdAsync(id)
+                ?? throw new AppError("Media content not found", 404);
             return mediaContent.MediaContentToMediaContentResponseDTO();
         }
 
@@ -79,21 +81,12 @@ namespace SocialMediaServer.Services.Implementations
                 throw new AppError("Media file is required", 400);
             }
 
-            var mediaContentToUpdate = await _mediaContentRepository.GetByIdAsync(id);
-
-            if (mediaContentToUpdate == null)
-                throw new AppError("Media content not found", 404);
+            var mediaContentToUpdate = await _mediaContentRepository.GetByIdAsync(id)
+                ?? throw new AppError("Media content not found", 404);
 
             var post = await _postRepository.GetByIdAsync(mediaContentToUpdate.PostId);
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-                throw new AppError("You are not authorized", 401);
-
-            if (post.CreatorId != userId)
-                throw new AppError("You do not have permision to delete this like", 401);
-
+            await CheckPermissionAsync(post.CreatorId);
 
             await _mediaService.DeleteMediaAsync(mediaContentToUpdate.Media_Url, "MediaContent");
 
@@ -110,21 +103,12 @@ namespace SocialMediaServer.Services.Implementations
         public async Task<MediaContentResponseDTO> PatchAsync(MediaContentPatchDTO mediaContentPatchDTO, 
             int id, IFormFile? mediaFile)
         {
-            var mediaContentToUpdate = await _mediaContentRepository.GetByIdAsync(id);
-
-            if (mediaContentToUpdate == null)
-                throw new AppError("Media content not found", 404);
+            var mediaContentToUpdate = await _mediaContentRepository.GetByIdAsync(id)
+                ?? throw new AppError("Media content not found", 404);
 
             var post = await _postRepository.GetByIdAsync(mediaContentToUpdate.PostId);
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-                throw new AppError("You are not authorized", 401);
-
-            if (post.CreatorId != userId)
-                throw new AppError("You do not have permision to delete this like", 401);
-
+            await CheckPermissionAsync(post.CreatorId);
 
             var mediaContent = mediaContentPatchDTO.MediaContentPatchDTOToMediaContent(mediaContentToUpdate);
 
@@ -143,24 +127,38 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var mediaContent = await _mediaContentRepository.GetByIdAsync(id);
-
-            if (mediaContent == null)
-                throw new AppError("Media content not found", 404);
+            var mediaContent = await _mediaContentRepository.GetByIdAsync(id)
+                ?? throw new AppError("Media content not found", 404);
 
             var post = await _postRepository.GetByIdAsync(mediaContent.PostId);
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-                throw new AppError("You are not authorized", 401);
-
-            if (post.CreatorId != userId)
-                throw new AppError("You do not have permision to delete this like", 401);
+            await CheckPermissionAsync(post.CreatorId);
 
             await _mediaService.DeleteMediaAsync(mediaContent.Media_Url, "MediaContent");
 
             return await _mediaContentRepository.DeleteAsync(id);
+        }
+
+        private async Task<User> GetCurrentUserAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                throw new AppError("You are not authorized", 401);
+
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new AppError("User login not found", 404);
+
+            return user;
+        }
+
+        private async Task CheckPermissionAsync(string creatorId)
+        {
+            var user = await GetCurrentUserAsync();
+            var roles = await _userRepository.GetUsersRoles(user);
+
+            if (creatorId != user.Id && !roles.Contains("Admin"))
+                throw new AppError("You do not have permission to perform this action", 401);
         }
     }
 }
