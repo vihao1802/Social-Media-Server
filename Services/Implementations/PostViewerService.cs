@@ -35,12 +35,7 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<PostViewerResponseDTO> CreateByPostIdAsync(PostViewerCreateDTO postViewerCreateDTO)
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-                throw new AppError("You are not authorized", 401);
-
-            var user = await _userRepository.GetUserById(userId);
+            var user = await _userRepository.GetUserById(postViewerCreateDTO.UserId);
             var post = await _postRepository.GetByIdAsync(postViewerCreateDTO.PostId);
 
             var postViewer = postViewerCreateDTO.PostViewerCreateDTOToPostViewer();
