@@ -8,6 +8,7 @@ namespace SocialMediaServer.Controllers
 {
 
     [ApiController]
+    [Authorize]
     [Route("api/comment/")]
 
     public class CommentController(
@@ -110,6 +111,7 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpDelete("post/{post_id}")]
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteAllByPostIdAsync(int post_id)
         {
             try

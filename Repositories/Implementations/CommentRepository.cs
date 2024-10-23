@@ -39,7 +39,8 @@ namespace SocialMediaServer.Repositories.Implementations
 
         public async Task<Comment> GetByIdAsync(int id)
         {
-            var comment = await _dbContext.Comments.FirstOrDefaultAsync(p => p.Id == id);
+            var comment = await _dbContext.Comments.FirstOrDefaultAsync(p => p.Id == id)
+                ?? throw new AppError("Comment not found", 404);
             if (comment.CommentId != null)
             {
                 comment.ParentComment = await _dbContext.Comments.FirstOrDefaultAsync(p => p.Id == comment.CommentId);
