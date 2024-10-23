@@ -47,10 +47,12 @@ namespace SocialMediaServer.Controllers
             }
             catch (System.Exception ex)
             {
+                Console.WriteLine(ex);
                 return StatusCode(500, ex.Message);
             }
         }
 
+        [Authorize]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {

@@ -52,7 +52,7 @@ namespace SocialMediaServer.Services.Implementations
 
             var user_by_username = await _UserRepository.GetUserByUsername(registerDto.UserName);
             if (user_by_username != null)
-                throw new AppError("Username existed", 500);
+                throw new AppError("Username existed", 400);
 
             var newUser = new User
             {
@@ -65,7 +65,7 @@ namespace SocialMediaServer.Services.Implementations
             var created_user_result = await _AuthRepository.Register(newUser, registerDto.Password);
 
             if (!created_user_result.Succeeded)
-                throw new AppError("Register failed", 500);
+                throw new AppError(created_user_result.Errors.FirstOrDefault().Description, 400);
 
             return;
         }
