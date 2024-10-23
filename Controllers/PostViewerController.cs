@@ -32,12 +32,12 @@ namespace SocialMediaServer.Controllers
             return CreatedAtAction(nameof(CreateByPostId), postViewer);
         }
 
-        [HttpDelete("{id}/{post_id}")]
-        public async Task<IActionResult> DeletePost(int id, int post_id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePost(int id)
         {
             try
             {
-                await _postViewerService.DeleteByPostIdAsync(id, post_id);
+                await _postViewerService.DeleteByIdAsync(id);
                 return NoContent();
             }
             catch (AppError ex)

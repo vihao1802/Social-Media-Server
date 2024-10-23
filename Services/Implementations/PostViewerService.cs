@@ -2,6 +2,7 @@
 using SocialMediaServer.DTOs.Request.PostViewer;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
+using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Implementations;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
@@ -67,22 +68,38 @@ namespace SocialMediaServer.Services.Implementations
             return postViewer.PostViewerToPostViewerResponseDTO();
         }
 
-        public async Task<bool> DeleteByPostIdAsync(int id, int postId)
+        public async Task<bool> DeleteByIdAsync(int id)
         {
             var postViewer = await _postViewerRepository.GetByIdAsync(id);
 
             if (postViewer == null)
                 throw new AppError("PostViewer not found", 404);
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await CheckPermissionAsync(postViewer.UserId);
 
+            return await _postViewerRepository.DeleteByIdAsync(id);
+        }
+
+        private async Task<User> GetCurrentUserAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
                 throw new AppError("You are not authorized", 401);
 
-            if (postViewer.UserId != userId)
-                throw new AppError("You do not have permision to delete this like", 401);
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new AppError("User login not found", 404);
 
-            return await _postViewerRepository.DeleteByPostidAsync(id, postId);
+            return user;
+        }
+
+        private async Task CheckPermissionAsync(string creatorId)
+        {
+            var user = await GetCurrentUserAsync();
+            var roles = await _userRepository.GetUsersRoles(user);
+
+            if (creatorId != user.Id && !roles.Contains("Admin"))
+                throw new AppError("You do not have permission to perform this action", 401);
         }
     }
 }
