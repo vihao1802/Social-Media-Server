@@ -20,6 +20,11 @@ namespace SocialMediaServer.Repositories.Implementations
             var postViewers = _dbContext.PostViewers
                 .Where(postViewer => postViewer.PostId == postId)
                 .ToListAsync();
+            foreach (var postViewer in postViewers.Result)
+            {
+                postViewer.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == postViewer.PostId);
+                postViewer.User = _dbContext.Users.FirstOrDefault(u => u.Id == postViewer.UserId);
+            }
             return postViewers;
         }
 
@@ -32,13 +37,18 @@ namespace SocialMediaServer.Repositories.Implementations
 
         public async Task<PostViewer> GetByIdAsync(int id)
         {
-            return await _dbContext.PostViewers.FirstOrDefaultAsync(pv => pv.Id == id);
+            var postViewer = await _dbContext.PostViewers.FirstOrDefaultAsync(pv => pv.Id == id)
+                ?? throw new AppError("Post viewer not found", 404);
+            postViewer.Post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == postViewer.PostId);
+            postViewer.User = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == postViewer.UserId);
+
+            return postViewer;
                 
         }
 
-        public async Task<bool> DeleteByPostidAsync(int id, int postId)
+        public async Task<bool> DeleteByIdAsync(int id)
         {
-            var postViewer = await _dbContext.PostViewers.FirstOrDefaultAsync(pv => pv.Id == id && pv.PostId == postId);
+            var postViewer = await _dbContext.PostViewers.FirstOrDefaultAsync(pv => pv.Id == id);
             if (postViewer == null)
             {
                 return false;
