@@ -2,6 +2,7 @@
 using SocialMediaServer.DTOs.Request.MediaContent;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
+using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
 using System.Security.Claims;
@@ -122,15 +123,7 @@ namespace SocialMediaServer.Services.Implementations
             if (user == null)
                 throw new AppError("User not found", 404);
 
-            //var post = await _postRepository.GetByIdAsync(mediaContentToUpdate.PostId);
-
-            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            //if (userId == null)
-            //    throw new AppError("You are not authorized", 401);
-
-            //if (post.CreatorId != userId)
-            //    throw new AppError("You do not have permision to delete this like", 401);
+            await CheckPermissionAsync(commentToUpdate.UserId);
 
             var comment = commentUpdateDTO.CommentUpdateDTOToComment(commentToUpdate);
 
@@ -174,15 +167,7 @@ namespace SocialMediaServer.Services.Implementations
             if (commentToUpdate == null)
                 throw new AppError("Comment not found", 404);
 
-            //var post = await _postRepository.GetByIdAsync(mediaContentToUpdate.PostId);
-
-            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            //if (userId == null)
-            //    throw new AppError("You are not authorized", 401);
-
-            //if (post.CreatorId != userId)
-            //    throw new AppError("You do not have permision to delete this like", 401);
+            await CheckPermissionAsync(commentToUpdate.UserId);
 
             var comment = commentPatchDTO.CommentPatchDTOToComment(commentToUpdate);
 
@@ -237,15 +222,7 @@ namespace SocialMediaServer.Services.Implementations
             if (comment == null)
                 throw new AppError("Comment not found", 404);
 
-            //var post = await _postRepository.GetByIdAsync(mediaContent.PostId);
-
-            //var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            //if (userId == null)
-            //    throw new AppError("You are not authorized", 401);
-
-            //if (post.CreatorId != userId)
-            //    throw new AppError("You do not have permision to delete this like", 401);
+            await CheckPermissionAsync(comment.UserId);
 
             await _mediaService.DeleteMediaAsync(comment.Content_gif, "CommentContentGif");
 
@@ -262,6 +239,28 @@ namespace SocialMediaServer.Services.Implementations
             }
 
             return await _commentRepository.DeleteAllByPostIdAsync(postId);
+        }
+
+        private async Task<User> GetCurrentUserAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                throw new AppError("You are not authorized", 401);
+
+            var user = await _userRepository.GetUserById(userId);
+            if (user == null)
+                throw new AppError("User login not found", 404);
+
+            return user;
+        }
+
+        private async Task CheckPermissionAsync(string creatorId)
+        {
+            var user = await GetCurrentUserAsync();
+            var roles = await _userRepository.GetUsersRoles(user);
+
+            if (creatorId != user.Id && !roles.Contains("Admin"))
+                throw new AppError("You do not have permission to perform this action", 401);
         }
     }
 }
