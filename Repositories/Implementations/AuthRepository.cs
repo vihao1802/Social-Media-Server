@@ -55,12 +55,9 @@ namespace SocialMediaServer.Repositories.Implementations
             var created_user = await _userManager.CreateAsync(newUser, password);
 
             if (created_user.Succeeded)
-            {
                 await _userManager.AddToRoleAsync(newUser, "User");
 
-                return created_user;
-            }
-            return IdentityResult.Failed(new IdentityError { Description = "Register failed!" });
+            return created_user;
         }
 
         public async Task<IdentityResult> ResetPassword(User user, string resetToken, string newPassword)
