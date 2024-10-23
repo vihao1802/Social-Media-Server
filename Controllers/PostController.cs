@@ -49,8 +49,7 @@ namespace SocialMediaServer.Controllers
                 return NotFound(ex.Message);
             }
         }
-
-        [Authorize(Roles = "User")]           
+        
         [HttpPost]
         public async Task<IActionResult> CreatePost(
             [FromBody] PostCreateDTO postCreateDTO)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 
@@ -19,6 +20,10 @@ namespace SocialMediaServer.Repositories.Implementations
             var posts = _dbContext.Posts
                 .Where(post => post.Visibility == Visibility.Public)
                 .ToListAsync();
+            foreach (var post in posts.Result)
+            {
+                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+            }
             return posts;
         }
 
@@ -27,6 +32,10 @@ namespace SocialMediaServer.Repositories.Implementations
             var posts = _dbContext.Posts
                 .Where(post => post.CreatorId == userId && post.Visibility == Visibility.Public)
                 .ToListAsync();
+            foreach (var post in posts.Result)
+            {
+                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+            }
             return posts;
         }
 
@@ -35,6 +44,10 @@ namespace SocialMediaServer.Repositories.Implementations
             var posts = _dbContext.Posts
                 .Where(post => post.CreatorId == userId && (post.Visibility == Visibility.Public || post.Visibility == Visibility.FriendsOnly))
                 .ToListAsync();
+            foreach (var post in posts.Result)
+            {
+                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+            }
             return posts;
         }
 
@@ -43,12 +56,19 @@ namespace SocialMediaServer.Repositories.Implementations
             var posts = _dbContext.Posts
                 .Where(post => post.CreatorId == meId)
                 .ToListAsync();
+            foreach (var post in posts.Result)
+            {
+                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+            }
             return posts;
         }
 
         public async Task<Post> GetByIdAsync(int id)
         {
-            return await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id) ?? throw new ArgumentNullException(nameof(id));
+            var post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id)
+                ?? throw new AppError("Post not found", 404);
+            post.Creator = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == post.CreatorId);
+            return post;
         }
 
         public async Task<Post> CreateAsync(Post post)
