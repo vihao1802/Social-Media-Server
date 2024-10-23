@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 
@@ -17,6 +18,10 @@ namespace SocialMediaServer.Repositories.Implementations
         public Task<List<MediaContent>> GetAllMediaContentAsync()
         {
             var mediaContents = _dbContext.MediaContents.ToListAsync();
+            foreach (var mediaContent in mediaContents.Result)
+            {
+                mediaContent.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == mediaContent.PostId);
+            }
             return mediaContents;
         }
 
@@ -25,12 +30,21 @@ namespace SocialMediaServer.Repositories.Implementations
             var mediaContents = _dbContext.MediaContents
                 .Where(mediaContent => mediaContent.PostId == postId)
                 .ToListAsync();
+            foreach (var mediaContent in mediaContents.Result)
+            {
+                mediaContent.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == mediaContent.PostId);
+            }
             return mediaContents;
         }
 
         public async Task<MediaContent> GetByIdAsync(int id)
         {
-            return await _dbContext.MediaContents.FirstOrDefaultAsync(p => p.Id == id) ?? throw new ArgumentNullException(nameof(id));
+            var mediaContent = await _dbContext.MediaContents.FirstOrDefaultAsync(p => p.Id == id)
+                ?? throw new AppError("Media content not found", 404);
+
+            mediaContent.Post = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == mediaContent.PostId);
+            
+            return mediaContent;
         }
 
         public async Task<MediaContent> CreateAsync(MediaContent mediaContent)

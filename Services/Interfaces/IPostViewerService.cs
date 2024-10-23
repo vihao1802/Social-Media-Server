@@ -10,6 +10,6 @@ namespace SocialMediaServer.Services.Interfaces
 
         Task<PostViewerResponseDTO> GetByIdAsync(int id);
 
-        Task<bool> DeleteByPostIdAsync(int id, int postId);
+        Task<bool> DeleteByIdAsync(int id);
     }
 }
