@@ -8,6 +8,6 @@ namespace SocialMediaServer.Repositories.Interfaces
        Task<List<PostViewer>> GetAllByPostIdAsync(int postId);
        Task<PostViewer> CreateByPostIdAsync(PostViewer postViewer);
        Task<PostViewer> GetByIdAsync(int id);
-       Task<bool> DeleteByPostidAsync(int id, int postId);
+       Task<bool> DeleteByIdAsync(int id);
     }
 }
