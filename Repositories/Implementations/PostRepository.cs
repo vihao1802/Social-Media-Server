@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request.Post;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -15,52 +17,112 @@ namespace SocialMediaServer.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public Task<List<Post>> GetAllPostsAsync()
+        public async Task<PaginatedResult<Post>> GetAllPostsAsync(PostQueryDTO postQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+                    {
+                        {"Id", postQueryDTO.Id},
+                        {"Content", postQueryDTO.Content },
+                        {"CreatorId", postQueryDTO.CreatorId },
+                        {"Create_at", postQueryDTO.Create_at }
+                    };
+
             var posts = _dbContext.Posts
-                .Where(post => post.Visibility == Visibility.Public)
-                .ToListAsync();
-            foreach (var post in posts.Result)
+                .Where(post => post.Visibility == Visibility.Public);
+
+            foreach (var post in posts)
             {
-                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+                post.Creator = _dbContext.Users.FirstOrDefault(p => p.Id == post.CreatorId);
             }
-            return posts;
+
+            var postsQuery = posts
+                .ApplyIncludes(postQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(postQueryDTO.Sort)
+                .ApplyPaginationAsync(postQueryDTO.Page, postQueryDTO.PageSize);
+            
+            return await postsQuery;
         }
 
-        public Task<List<Post>> GetAllPostsPublicByUserIdAsync(string userId)
+        public async Task<PaginatedResult<Post>> GetAllPostsPublicByUserIdAsync(string userId, PostQueryDTO postQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+                    {
+                        {"Id", postQueryDTO.Id},
+                        {"Content", postQueryDTO.Content },
+                        {"CreatorId", postQueryDTO.CreatorId },
+                        {"Create_at", postQueryDTO.Create_at }
+                    };
+
             var posts = _dbContext.Posts
-                .Where(post => post.CreatorId == userId && post.Visibility == Visibility.Public)
-                .ToListAsync();
-            foreach (var post in posts.Result)
+                .Where(post => post.CreatorId == userId && post.Visibility == Visibility.Public);
+                
+            foreach (var post in posts)
             {
                 post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
             }
-            return posts;
+
+            var postsQuery = posts
+                .ApplyIncludes(postQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(postQueryDTO.Sort)
+                .ApplyPaginationAsync(postQueryDTO.Page, postQueryDTO.PageSize);
+
+            return await postsQuery;
         }
 
-        public Task<List<Post>> GetAllPostsOnlyFriendByUserIdAsync(string userId)
+        public async Task<PaginatedResult<Post>> GetAllPostsOnlyFriendByUserIdAsync(string userId, PostQueryDTO postQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+                    {
+                        {"Id", postQueryDTO.Id},
+                        {"Content", postQueryDTO.Content },
+                        {"CreatorId", postQueryDTO.CreatorId },
+                        {"Create_at", postQueryDTO.Create_at }
+                    };
+
             var posts = _dbContext.Posts
-                .Where(post => post.CreatorId == userId && (post.Visibility == Visibility.Public || post.Visibility == Visibility.FriendsOnly))
-                .ToListAsync();
-            foreach (var post in posts.Result)
+                .Where(post => post.CreatorId == userId && (post.Visibility == Visibility.Public || post.Visibility == Visibility.FriendsOnly));
+                
+            foreach (var post in posts)
             {
                 post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
             }
-            return posts;
+
+            var postsQuery = posts
+                .ApplyIncludes(postQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(postQueryDTO.Sort)
+                .ApplyPaginationAsync(postQueryDTO.Page, postQueryDTO.PageSize);
+
+            return await postsQuery;
         }
 
-        public Task<List<Post>> GetAllPostsByMeAsync(string meId)
+        public async Task<PaginatedResult<Post>> GetAllPostsByMeAsync(string meId, PostQueryDTO postQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+                    {
+                        {"Id", postQueryDTO.Id},
+                        {"Content", postQueryDTO.Content },
+                        {"CreatorId", postQueryDTO.CreatorId },
+                        {"Create_at", postQueryDTO.Create_at }
+                    };
+
             var posts = _dbContext.Posts
-                .Where(post => post.CreatorId == meId)
-                .ToListAsync();
-            foreach (var post in posts.Result)
+                .Where(post => post.CreatorId == meId);
+
+            foreach (var post in posts)
             {
                 post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
             }
-            return posts;
+
+            var postsQuery = posts
+                .ApplyIncludes(postQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(postQueryDTO.Sort)
+                .ApplyPaginationAsync(postQueryDTO.Page, postQueryDTO.PageSize);
+
+            return await postsQuery;
         }
 
         public async Task<Post> GetByIdAsync(int id)

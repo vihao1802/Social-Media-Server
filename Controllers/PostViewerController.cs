@@ -18,9 +18,9 @@ namespace SocialMediaServer.Controllers
         private readonly IPostViewerService _postViewerService = postViewerService;
 
         [HttpGet("{post_id}")]
-        public async Task<IActionResult> GetAllByPostId(int post_id)
+        public async Task<IActionResult> GetAllByPostId(int post_id, [FromQuery] PostViewerQueryDTO postViewerQueryDTO)
         {
-            var posts = await _postViewerService.GetAllByPostIdAsync(post_id);
+            var posts = await _postViewerService.GetAllByPostIdAsync(post_id, postViewerQueryDTO);
             return Ok(posts);
         }
          

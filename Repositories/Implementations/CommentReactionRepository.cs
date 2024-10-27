@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request.MediaContent;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -15,17 +17,32 @@ namespace SocialMediaServer.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public Task<List<CommentReaction>> GetAllByCommentIdAsync(int commentId)
+        public async Task<PaginatedResult<CommentReaction>> GetAllByCommentIdAsync(int commentId, CommentReactionQueryDTO commentReactionQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", commentReactionQueryDTO.Id},
+                {"UserId", commentReactionQueryDTO.UserId },
+                {"CommentId", commentReactionQueryDTO.CommentId },
+                {"Reaction_at", commentReactionQueryDTO.Reaction_at }
+            };
+
             var commentReactions = _dbContext.CommentReactions
-                .Where(commentReaction => commentReaction.CommentId == commentId)
-                .ToListAsync();
-            foreach (var commentReaction in commentReactions.Result)
+                .Where(commentReaction => commentReaction.CommentId == commentId);
+
+            foreach (var commentReaction in commentReactions)
             {
                 commentReaction.Comment = _dbContext.Comments.FirstOrDefault(p => p.Id == commentReaction.CommentId);
                 commentReaction.User = _dbContext.Users.FirstOrDefault(u => u.Id == commentReaction.UserId);
             }
-            return commentReactions;
+
+            var commentReactionsQuery = commentReactions
+                .ApplyIncludes(commentReactionQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(commentReactionQueryDTO.Sort)
+                .ApplyPaginationAsync(commentReactionQueryDTO.Page, commentReactionQueryDTO.PageSize);
+
+            return await commentReactionsQuery;
         }
 
         public async Task<CommentReaction> CreateByCommentIdAsync(CommentReaction commentReaction)

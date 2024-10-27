@@ -5,6 +5,7 @@ using SocialMediaServer.Mappers;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 using System.Security.Claims;
 
 namespace SocialMediaServer.Services.Implementations
@@ -16,7 +17,7 @@ namespace SocialMediaServer.Services.Implementations
         private readonly IRelationshipRepository _relationshipRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PostService(IPostRepository postRepository, IUserRepository userRepository, 
+        public PostService(IPostRepository postRepository, IUserRepository userRepository,
             IHttpContextAccessor httpContextAccessor, IRelationshipRepository relationshipRepository)
         {
             _postRepository = postRepository;
@@ -25,33 +26,43 @@ namespace SocialMediaServer.Services.Implementations
             _relationshipRepository = relationshipRepository;
         }
 
-        public async Task<List<PostResponseDTO>> GetAllAsync()
+        public async Task<PaginatedResult<PostResponseDTO>> GetAllAsync(PostQueryDTO postQueryDTO)
         {
-            var posts = await _postRepository.GetAllPostsAsync();
-            var listPostsDto = posts.Select(post => post.PostToPostResponseDTO());
-            return listPostsDto.ToList();
+            var posts = await _postRepository.GetAllPostsAsync(postQueryDTO);
+
+            var listPostsDto = posts.Items.Select(post => post.PostToPostResponseDTO()).ToList();
+
+            return new PaginatedResult<PostResponseDTO>(
+                listPostsDto,
+                posts.TotalItems,
+                posts.Page,
+                posts.PageSize);
         }
 
-        public async Task<List<PostResponseDTO>> GetAllByMeAsync()
+        public async Task<PaginatedResult<PostResponseDTO>> GetAllByMeAsync(PostQueryDTO postQueryDTO)
         {
             var userLogin = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            List<PostResponseDTO> listPostsDto;
-           
+            PaginatedResult<PostResponseDTO> listPostsDto;
+
             if (userLogin != null)
             {
-                var posts = await _postRepository.GetAllPostsByMeAsync(userLogin);
-                listPostsDto = posts.Select(post => post.PostToPostResponseDTO()).ToList();
-            }    
+                var posts = await _postRepository.GetAllPostsByMeAsync(userLogin, postQueryDTO);
+                listPostsDto = new PaginatedResult<PostResponseDTO>(
+                    posts.Items.Select(post => post.PostToPostResponseDTO()).ToList(),
+                    posts.TotalItems,
+                    posts.Page,
+                    posts.PageSize);
+            }
             else
             {
                 throw new AppError("You are not authorized to see this content!", 401);
             }
-            
+
             return listPostsDto;
         }
 
-        public async Task<List<PostResponseDTO>> GetAllByUserIdAsync(string userViewId)
+        public async Task<PaginatedResult<PostResponseDTO>> GetAllByUserIdAsync(string userViewId, PostQueryDTO postQueryDTO)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -61,31 +72,43 @@ namespace SocialMediaServer.Services.Implementations
             var relationshipUserView_User = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(userId, userViewId);
             var relationshipUser_UserView = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(userViewId, userId);
 
-            List<PostResponseDTO> listPostsDto;
-            List<Post> posts;
+            PaginatedResult<PostResponseDTO> listPostsDto;
+            PaginatedResult<Post> posts;
             if (relationshipUserView_User == null && relationshipUser_UserView == null)
             {
-                posts = await _postRepository.GetAllPostsPublicByUserIdAsync(userViewId);
-                listPostsDto = posts.Select(post => post.PostToPostResponseDTO()).ToList();
-            }    
-            else 
+                posts = await _postRepository.GetAllPostsPublicByUserIdAsync(userViewId, postQueryDTO);
+                listPostsDto = new PaginatedResult<PostResponseDTO>(
+                    posts.Items.Select(post => post.PostToPostResponseDTO()).ToList(),
+                    posts.TotalItems,
+                    posts.Page,
+                    posts.PageSize);
+            }
+            else
                 if (relationshipUserView_User?.Relationship_type == RelationshipType.Block ||
                     relationshipUser_UserView.Relationship_type == RelationshipType.Block)
-                {
-                    throw new AppError("You are not authorized to see this content", 401);
-                }
-                else
+            {
+                throw new AppError("You are not authorized to see this content", 401);
+            }
+            else
                 if (relationshipUser_UserView.Relationship_type == RelationshipType.Follow &&
                     relationshipUserView_User?.Relationship_type == RelationshipType.Follow)
-                {
-                    posts = await _postRepository.GetAllPostsOnlyFriendByUserIdAsync(userViewId);
-                    listPostsDto = posts.Select(post => post.PostToPostResponseDTO()).ToList();
-                }
-                else 
-                {
-                    posts = await _postRepository.GetAllPostsPublicByUserIdAsync(userViewId);
-                    listPostsDto = posts.Select(post => post.PostToPostResponseDTO()).ToList(); 
-                }
+            {
+                posts = await _postRepository.GetAllPostsOnlyFriendByUserIdAsync(userViewId, postQueryDTO);
+                listPostsDto = new PaginatedResult<PostResponseDTO>(
+                    posts.Items.Select(post => post.PostToPostResponseDTO()).ToList(),
+                    posts.TotalItems,
+                    posts.Page,
+                    posts.PageSize);
+            }
+            else
+            {
+                posts = await _postRepository.GetAllPostsPublicByUserIdAsync(userViewId, postQueryDTO);
+                listPostsDto = new PaginatedResult<PostResponseDTO>(
+                    posts.Items.Select(post => post.PostToPostResponseDTO()).ToList(),
+                    posts.TotalItems,
+                    posts.Page,
+                    posts.PageSize);
+            }
 
             return listPostsDto;
         }
@@ -121,7 +144,7 @@ namespace SocialMediaServer.Services.Implementations
 
             if (post == null)
                 throw new AppError("Post not found!", 404);
-            
+
             await CheckPermissionAsync(post.CreatorId);
 
             return await _postRepository.DeleteAsync(id);
@@ -172,10 +195,10 @@ namespace SocialMediaServer.Services.Implementations
                 postToUpdate.Content = post.Content;
 
             if (post.Visibility != null)
-                postToUpdate.Visibility = (Visibility) post.Visibility;
+                postToUpdate.Visibility = (Visibility)post.Visibility;
 
             if (post.Is_story != null)
-                postToUpdate.Is_story = (bool) post.Is_story;
+                postToUpdate.Is_story = (bool)post.Is_story;
 
 
             var updatedPost = await _postRepository.UpdateAsync(postToUpdate);

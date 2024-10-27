@@ -17,23 +17,23 @@ namespace SocialMediaServer.Controllers
         private readonly ICommentService _commentService = commentService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAllComment()
+        public async Task<IActionResult> GetAllComment([FromQuery] CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentService.GetAllAsync();
+            var comments = await _commentService.GetAllAsync(commentQueryDTO);
             return Ok(comments);
         }
 
         [HttpGet("post/{post_id}")]
-        public async Task<IActionResult> GetAllByPostId(int post_id)
+        public async Task<IActionResult> GetAllByPostId(int post_id, [FromQuery] CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentService.GetAllByPostIdAsync(post_id);
+            var comments = await _commentService.GetAllByPostIdAsync(post_id, commentQueryDTO);
             return Ok(comments);
         }
 
         [HttpGet("user/{user_id}")]
-        public async Task<IActionResult> GetAllByUserId(string user_id)
+        public async Task<IActionResult> GetAllByUserId(string user_id, [FromQuery] CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentService.GetAllByUserIdAsync(user_id);
+            var comments = await _commentService.GetAllByUserIdAsync(user_id, commentQueryDTO);
             return Ok(comments);
         }
 

@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request.MediaContent;
+using SocialMediaServer.DTOs.Request.PostViewer;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -15,26 +18,96 @@ namespace SocialMediaServer.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public Task<List<Comment>> GetAllCommentAsync()
+        public async Task<PaginatedResult<Comment>> GetAllCommentAsync(CommentQueryDTO commentQueryDTO)
         {
-            var comments = _dbContext.Comments.ToListAsync();
-            return comments;
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", commentQueryDTO.Id},
+                {"ParentCommentId", commentQueryDTO.ParentCommentId },
+                {"PostId", commentQueryDTO.PostId },
+                {"UserId", commentQueryDTO.UserId },
+                {"Content_gif", commentQueryDTO.Content_gif },
+                {"Content", commentQueryDTO.Content }
+            };
+
+            var comments = _dbContext.Comments;
+
+            foreach (var comment in comments)
+            {
+                comment.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == comment.PostId);
+                comment.User = _dbContext.Users.FirstOrDefault(u => u.Id == comment.UserId);
+                comment.ParentComment = _dbContext.Comments.FirstOrDefault(c => c.Id == comment.CommentId);
+            }
+
+            var commentsQuery = comments
+                .ApplyIncludes(commentQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(commentQueryDTO.Sort)
+                .ApplyPaginationAsync(commentQueryDTO.Page, commentQueryDTO.PageSize);
+
+            return await commentsQuery;
         }
 
-        public Task<List<Comment>> GetAllCommentByPostIdAsync(int postId)
+        public async Task<PaginatedResult<Comment>> GetAllCommentByPostIdAsync(int postId, CommentQueryDTO commentQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", commentQueryDTO.Id},
+                {"ParentCommentId", commentQueryDTO.ParentCommentId },
+                {"PostId", commentQueryDTO.PostId },
+                {"UserId", commentQueryDTO.UserId },
+                {"Content_gif", commentQueryDTO.Content_gif },
+                {"Content", commentQueryDTO.Content }
+            };
+
             var comments = _dbContext.Comments
-                .Where(comment => comment.PostId == postId)
-                .ToListAsync();
-            return comments;
+                .Where(comment => comment.PostId == postId);
+
+            foreach (var comment in comments)
+            {
+                comment.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == comment.PostId);
+                comment.User = _dbContext.Users.FirstOrDefault(u => u.Id == comment.UserId);
+                comment.ParentComment = _dbContext.Comments.FirstOrDefault(c => c.Id == comment.CommentId);
+            }
+
+            var commentsQuery = comments
+                .ApplyIncludes(commentQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(commentQueryDTO.Sort)
+                .ApplyPaginationAsync(commentQueryDTO.Page, commentQueryDTO.PageSize);
+
+            return await commentsQuery;
         }
 
-        public Task<List<Comment>> GetCommentByUserIdAsync(string userId)
+        public async Task<PaginatedResult<Comment>> GetCommentByUserIdAsync(string userId, CommentQueryDTO commentQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", commentQueryDTO.Id},
+                {"ParentCommentId", commentQueryDTO.ParentCommentId },
+                {"PostId", commentQueryDTO.PostId },
+                {"UserId", commentQueryDTO.UserId },
+                {"Content_gif", commentQueryDTO.Content_gif },
+                {"Content", commentQueryDTO.Content }
+            };
+
             var comments = _dbContext.Comments
-                .Where(comment => comment.UserId == userId)
-                .ToListAsync();
-            return comments;
+                .Where(comment => comment.UserId == userId);
+
+            foreach (var comment in comments)
+            {
+                comment.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == comment.PostId);
+                comment.User = _dbContext.Users.FirstOrDefault(u => u.Id == comment.UserId);
+                comment.ParentComment = _dbContext.Comments.FirstOrDefault(c => c.Id == comment.CommentId);
+            }
+
+            var commentsQuery = comments
+                .ApplyIncludes(commentQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(commentQueryDTO.Sort)
+                .ApplyPaginationAsync(commentQueryDTO.Page, commentQueryDTO.PageSize);
+
+            return await commentsQuery;
         }
 
         public async Task<Comment> GetByIdAsync(int id)

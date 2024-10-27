@@ -1,10 +1,12 @@
 ﻿using DTOs.Response;
+using Microsoft.Extensions.Hosting;
 using SocialMediaServer.DTOs.Request.MediaContent;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 using System.Security.Claims;
 
 namespace SocialMediaServer.Services.Implementations
@@ -28,20 +30,30 @@ namespace SocialMediaServer.Services.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<List<MediaContentResponseDTO>> GetAllAsync()
+        public async Task<PaginatedResult<MediaContentResponseDTO>> GetAllAsync(MediaContentQueryDTO mediaContentQueryDTO)
         {
-            var mediaContents = await _mediaContentRepository.GetAllMediaContentAsync();
-            var listMediaContentsDto = mediaContents.Select(mediaContent =>
-            mediaContent.MediaContentToMediaContentResponseDTO());
-            return listMediaContentsDto.ToList();
+            var mediaContents = await _mediaContentRepository.GetAllMediaContentAsync(mediaContentQueryDTO);
+            var listMediaContentsDto = mediaContents.Items.Select(mediaContent =>
+            mediaContent.MediaContentToMediaContentResponseDTO()).ToList();
+
+            return new PaginatedResult<MediaContentResponseDTO>(
+                listMediaContentsDto,
+                mediaContents.TotalItems,
+                mediaContents.Page,
+                mediaContents.PageSize);
         }
 
-        public async Task<List<MediaContentResponseDTO>> GetAllByPostIdAsync(int postId)
+        public async Task<PaginatedResult<MediaContentResponseDTO>> GetAllByPostIdAsync(int postId, MediaContentQueryDTO mediaContentQueryDTO)
         {
-            var mediaContents = await _mediaContentRepository.GetAllMediaContentByPostIdAsync(postId);
-            var listMediaContentsDto = mediaContents.Select(mediaContent => 
-            mediaContent.MediaContentToMediaContentResponseDTO());
-            return listMediaContentsDto.ToList();
+            var mediaContents = await _mediaContentRepository.GetAllMediaContentByPostIdAsync(postId, mediaContentQueryDTO);
+            var listMediaContentsDto = mediaContents.Items.Select(mediaContent => 
+            mediaContent.MediaContentToMediaContentResponseDTO()).ToList();
+
+            return new PaginatedResult<MediaContentResponseDTO>(
+                listMediaContentsDto,
+                mediaContents.TotalItems,
+                mediaContents.Page,
+                mediaContents.PageSize);
         }
 
         public async Task<MediaContentResponseDTO> GetByIdAsync(int id)

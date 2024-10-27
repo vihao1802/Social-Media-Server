@@ -16,23 +16,23 @@ namespace SocialMediaServer.Controllers
         private readonly IPostService _postService = postService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPost()
+        public async Task<IActionResult> GetAllPost([FromQuery] PostQueryDTO postQueryDTO)
         {
-            var posts = await _postService.GetAllAsync();
+            var posts = await _postService.GetAllAsync(postQueryDTO);
             return Ok(posts);
         }
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetAllPostByMe()
+        public async Task<IActionResult> GetAllPostByMe([FromQuery] PostQueryDTO postQueryDTO)
         {
-            var posts = await _postService.GetAllByMeAsync();
+            var posts = await _postService.GetAllByMeAsync(postQueryDTO);
             return Ok(posts);
         }
 
         [HttpGet("user/{user_id}")]
-        public async Task<IActionResult> GetAllPostByUserId(string user_id)
+        public async Task<IActionResult> GetAllPostByUserId(string user_id, [FromQuery] PostQueryDTO postQueryDTO)
         {
-            var posts = await _postService.GetAllByUserIdAsync(user_id);
+            var posts = await _postService.GetAllByUserIdAsync(user_id, postQueryDTO);
             return Ok(posts);
         }
 

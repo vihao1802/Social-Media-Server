@@ -19,9 +19,9 @@ namespace SocialMediaServer.Controllers
         private readonly ICommentReactionService _commentReactionService = commentReactionService;
 
         [HttpGet("{cmt_id}")]
-        public async Task<IActionResult> GetAllByCommentId(int cmt_id)
+        public async Task<IActionResult> GetAllByCommentId(int cmt_id, [FromQuery] CommentReactionQueryDTO commentReactionQueryDTO)
         {
-            var commentReactions = await _commentReactionService.GetAllByCommentIdAsync(cmt_id);
+            var commentReactions = await _commentReactionService.GetAllByCommentIdAsync(cmt_id, commentReactionQueryDTO);
             return Ok(commentReactions);
         }
          

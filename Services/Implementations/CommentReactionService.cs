@@ -7,6 +7,7 @@ using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Implementations;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 using System.Security.Claims;
 
 namespace SocialMediaServer.Services.Implementations
@@ -27,11 +28,16 @@ namespace SocialMediaServer.Services.Implementations
            _httpContextAccessor = httpContextAccessor;
        }
 
-       public async Task<List<CommentReactionResponseDTO>> GetAllByCommentIdAsync(int commentId)
+       public async Task<PaginatedResult<CommentReactionResponseDTO>> GetAllByCommentIdAsync(int commentId, CommentReactionQueryDTO commentReactionQueryDTO)
        {
-            var commentReactions = await _commentReactionRepository.GetAllByCommentIdAsync(commentId);
-            var listCommentReactionsDto = commentReactions.Select(commentReaction => commentReaction.CommentReactionToCommentReactionResponseDTO());
-            return listCommentReactionsDto.ToList();
+            var commentReactions = await _commentReactionRepository.GetAllByCommentIdAsync(commentId, commentReactionQueryDTO);
+            var listCommentReactionsDto = commentReactions.Items.Select(commentReaction => commentReaction.CommentReactionToCommentReactionResponseDTO()).ToList();
+
+            return new PaginatedResult<CommentReactionResponseDTO>(
+                listCommentReactionsDto,
+                commentReactions.TotalItems,
+                commentReactions.Page,
+                commentReactions.PageSize);
         }
 
         public async Task<CommentReactionResponseDTO> CreateByCommentIdAsync(CommentReactionCreateDTO commentReactionCreateDTO)
