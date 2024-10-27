@@ -1,4 +1,5 @@
 ﻿using DTOs.Response;
+using Microsoft.Extensions.Hosting;
 using SocialMediaServer.DTOs.Request.PostViewer;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
@@ -6,6 +7,7 @@ using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Implementations;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 using System.Security.Claims;
 
 namespace SocialMediaServer.Services.Implementations
@@ -26,11 +28,16 @@ namespace SocialMediaServer.Services.Implementations
            _httpContextAccessor = httpContextAccessor;
        }
 
-       public async Task<List<PostViewerResponseDTO>> GetAllByPostIdAsync(int postId)
+       public async Task<PaginatedResult<PostViewerResponseDTO>> GetAllByPostIdAsync(int postId, PostViewerQueryDTO postViewerQueryDTO)
        {
-            var postViewers = await _postViewerRepository.GetAllByPostIdAsync(postId);
-            var listPostViewersDto = postViewers.Select(post => post.PostViewerToPostViewerResponseDTO());
-            return listPostViewersDto.ToList();
+            var postViewers = await _postViewerRepository.GetAllByPostIdAsync(postId, postViewerQueryDTO);
+            var listPostViewersDto = postViewers.Items.Select(post => post.PostViewerToPostViewerResponseDTO()).ToList();
+
+            return new PaginatedResult<PostViewerResponseDTO>(
+                listPostViewersDto,
+                postViewers.TotalItems,
+                postViewers.Page,
+                postViewers.PageSize);
         }
 
         public async Task<PostViewerResponseDTO> CreateByPostIdAsync(PostViewerCreateDTO postViewerCreateDTO)

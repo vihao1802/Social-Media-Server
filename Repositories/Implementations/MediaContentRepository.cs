@@ -1,8 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request.MediaContent;
+using SocialMediaServer.DTOs.Request.Post;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -15,26 +19,56 @@ namespace SocialMediaServer.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public Task<List<MediaContent>> GetAllMediaContentAsync()
+        public async Task<PaginatedResult<MediaContent>> GetAllMediaContentAsync(MediaContentQueryDTO mediaContentQueryDTO)
         {
-            var mediaContents = _dbContext.MediaContents.ToListAsync();
-            foreach (var mediaContent in mediaContents.Result)
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", mediaContentQueryDTO.Id},
+                {"Media_type", mediaContentQueryDTO.Media_type },
+                {"Media_Url", mediaContentQueryDTO.Media_Url },
+                {"PostId", mediaContentQueryDTO.PostId }
+            };
+
+            var mediaContents = _dbContext.MediaContents;
+            foreach (var mediaContent in mediaContents)
             {
                 mediaContent.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == mediaContent.PostId);
             }
-            return mediaContents;
+
+            var mediaContentsQuery = mediaContents
+                .ApplyIncludes(mediaContentQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(mediaContentQueryDTO.Sort)
+                .ApplyPaginationAsync(mediaContentQueryDTO.Page, mediaContentQueryDTO.PageSize);
+
+            return await mediaContentsQuery;
         }
 
-        public Task<List<MediaContent>> GetAllMediaContentByPostIdAsync(int postId)
+        public async Task<PaginatedResult<MediaContent>> GetAllMediaContentByPostIdAsync(int postId, MediaContentQueryDTO mediaContentQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", mediaContentQueryDTO.Id},
+                {"Media_type", mediaContentQueryDTO.Media_type },
+                {"Media_Url", mediaContentQueryDTO.Media_Url },
+                {"PostId", mediaContentQueryDTO.PostId }
+            };
+
             var mediaContents = _dbContext.MediaContents
-                .Where(mediaContent => mediaContent.PostId == postId)
-                .ToListAsync();
-            foreach (var mediaContent in mediaContents.Result)
+                .Where(mediaContent => mediaContent.PostId == postId);
+                
+            foreach (var mediaContent in mediaContents)
             {
                 mediaContent.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == mediaContent.PostId);
             }
-            return mediaContents;
+
+            var mediaContentsQuery = mediaContents
+                .ApplyIncludes(mediaContentQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(mediaContentQueryDTO.Sort)
+                .ApplyPaginationAsync(mediaContentQueryDTO.Page, mediaContentQueryDTO.PageSize);
+
+            return await mediaContentsQuery;
         }
 
         public async Task<MediaContent> GetByIdAsync(int id)

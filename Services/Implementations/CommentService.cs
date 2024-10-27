@@ -5,6 +5,7 @@ using SocialMediaServer.Mappers;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 using SocialMediaServer.Services.Interfaces;
+using SocialMediaServer.Utils;
 using System.Security.Claims;
 
 namespace SocialMediaServer.Services.Implementations
@@ -28,28 +29,43 @@ namespace SocialMediaServer.Services.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<List<CommentResponseDTO>> GetAllAsync()
+        public async Task<PaginatedResult<CommentResponseDTO>> GetAllAsync(CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentRepository.GetAllCommentAsync();
-            var listCommentsDto = comments.Select(comment =>
-            comment.CommentToCommentResponseDTO());
-            return listCommentsDto.ToList();
+            var comments = await _commentRepository.GetAllCommentAsync(commentQueryDTO);
+            var listCommentsDto = comments.Items.Select(comment =>
+            comment.CommentToCommentResponseDTO()).ToList();
+
+            return new PaginatedResult<CommentResponseDTO>(
+                listCommentsDto,
+                comments.TotalItems,
+                comments.Page,
+                comments.PageSize);
         }
 
-        public async Task<List<CommentResponseDTO>> GetAllByPostIdAsync(int postId)
+        public async Task<PaginatedResult<CommentResponseDTO>> GetAllByPostIdAsync(int postId, CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentRepository.GetAllCommentByPostIdAsync(postId);
-            var listCommentsDto = comments.Select(comment => 
-            comment.CommentToCommentResponseDTO());
-            return listCommentsDto.ToList();
+            var comments = await _commentRepository.GetAllCommentByPostIdAsync(postId, commentQueryDTO);
+            var listCommentsDto = comments.Items.Select(comment =>
+            comment.CommentToCommentResponseDTO()).ToList();
+
+            return new PaginatedResult<CommentResponseDTO>(
+                listCommentsDto,
+                comments.TotalItems,
+                comments.Page,
+                comments.PageSize);
         }
 
-        public async Task<List<CommentResponseDTO>> GetAllByUserIdAsync(string userId)
+        public async Task<PaginatedResult<CommentResponseDTO>> GetAllByUserIdAsync(string userId, CommentQueryDTO commentQueryDTO)
         {
-            var comments = await _commentRepository.GetCommentByUserIdAsync(userId);
-            var listCommentsDto = comments.Select(comment => 
-            comment.CommentToCommentResponseDTO());
-            return listCommentsDto.ToList();
+            var comments = await _commentRepository.GetCommentByUserIdAsync(userId, commentQueryDTO);
+            var listCommentsDto = comments.Items.Select(comment =>
+            comment.CommentToCommentResponseDTO()).ToList();
+
+            return new PaginatedResult<CommentResponseDTO>(
+                listCommentsDto,
+                comments.TotalItems,
+                comments.Page,
+                comments.PageSize);
         }
 
         public async Task<CommentResponseDTO> GetByIdAsync(int id)
@@ -231,9 +247,10 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<bool> DeleteAllByPostIdAsync(int postId)
         {
-            var comments = await _commentRepository.GetAllCommentByPostIdAsync(postId);
+            CommentQueryDTO commentQueryDTO = new CommentQueryDTO();
+            var comments = await _commentRepository.GetAllCommentByPostIdAsync(postId, commentQueryDTO);
 
-            foreach (var comment in comments)
+            foreach (var comment in comments.Items)
             {
                 await _mediaService.DeleteMediaAsync(comment.Content_gif, "CommentContentGif");
             }

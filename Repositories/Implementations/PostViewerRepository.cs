@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request.Post;
+using SocialMediaServer.DTOs.Request.PostViewer;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -15,17 +18,30 @@ namespace SocialMediaServer.Repositories.Implementations
             _dbContext = dbContext;
         }
 
-        public Task<List<PostViewer>> GetAllByPostIdAsync(int postId)
+        public async Task<PaginatedResult<PostViewer>> GetAllByPostIdAsync(int postId, PostViewerQueryDTO postViewerQueryDTO)
         {
+            var filterParams = new Dictionary<string, object?>
+            {
+                {"Id", postViewerQueryDTO.Id},
+                {"PostId", postViewerQueryDTO.PostId },
+                {"UserId", postViewerQueryDTO.UserId }
+            };
+
             var postViewers = _dbContext.PostViewers
-                .Where(postViewer => postViewer.PostId == postId)
-                .ToListAsync();
-            foreach (var postViewer in postViewers.Result)
+                .Where(postViewer => postViewer.PostId == postId);
+                
+            foreach (var postViewer in postViewers)
             {
                 postViewer.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == postViewer.PostId);
                 postViewer.User = _dbContext.Users.FirstOrDefault(u => u.Id == postViewer.UserId);
             }
-            return postViewers;
+            var postViewersQuery = postViewers
+                .ApplyIncludes(postViewerQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(postViewerQueryDTO.Sort)
+                .ApplyPaginationAsync(postViewerQueryDTO.Page, postViewerQueryDTO.PageSize);
+
+            return await postViewersQuery;
         }
 
         public async Task<PostViewer> CreateByPostIdAsync(PostViewer postViewer)

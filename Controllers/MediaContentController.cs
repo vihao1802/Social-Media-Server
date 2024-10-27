@@ -17,16 +17,16 @@ namespace SocialMediaServer.Controllers
         private readonly IMediaContentService _mediaContentService = mediaContentService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMediaContent()
+        public async Task<IActionResult> GetAllMediaContent([FromQuery] MediaContentQueryDTO mediaContentQueryDTO)
         {
-            var posts = await _mediaContentService.GetAllAsync();
+            var posts = await _mediaContentService.GetAllAsync(mediaContentQueryDTO);
             return Ok(posts);
         }
 
         [HttpGet("post/{post_id}")]
-        public async Task<IActionResult> GetAllByPostId(int post_id)
+        public async Task<IActionResult> GetAllByPostId(int post_id, [FromQuery] MediaContentQueryDTO mediaContentQueryDTO)
         {
-            var posts = await _mediaContentService.GetAllByPostIdAsync(post_id);
+            var posts = await _mediaContentService.GetAllByPostIdAsync(post_id, mediaContentQueryDTO);
             return Ok(posts);
         }
 

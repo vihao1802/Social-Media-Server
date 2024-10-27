@@ -1,13 +1,14 @@
 ﻿using DTOs.Response;
 using SocialMediaServer.DTOs.Request.Post;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Services.Interfaces
 {
     public interface IPostService
     {
-        Task<List<PostResponseDTO>> GetAllAsync();
-        Task<List<PostResponseDTO>> GetAllByUserIdAsync(string userViewId);
-        Task<List<PostResponseDTO>> GetAllByMeAsync();
+        Task<PaginatedResult<PostResponseDTO>> GetAllAsync(PostQueryDTO postQueryDTO);
+        Task<PaginatedResult<PostResponseDTO>> GetAllByUserIdAsync(string userViewId, PostQueryDTO postQueryDTO);
+        Task<PaginatedResult<PostResponseDTO>> GetAllByMeAsync(PostQueryDTO postQueryDTO);
         Task<PostResponseDTO> GetByIdAsync(int id);
         Task<PostResponseDTO> CreateAsync(PostCreateDTO postCreateDTO);
         Task<PostResponseDTO> UpdateAsync(PostUpdateDTO post, int id);
