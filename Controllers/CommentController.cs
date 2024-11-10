@@ -8,7 +8,7 @@ namespace SocialMediaServer.Controllers
 {
 
     [ApiController]
-    // [Authorize]
+    [Authorize]
     [Route("api/comment/")]
 
     public class CommentController(

@@ -8,8 +8,5 @@ namespace SocialMediaServer.Models
         public string UserId { get; set; }
         public User User { get; set; }
         public DateTime Join_at { get; set; } = DateTime.Now;
-        public bool IsLeft { get; set; } = false;
-        public DateTime? Left_at { get; set; }
-        public bool isDelete = false;
     }
 }

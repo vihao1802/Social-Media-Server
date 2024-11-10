@@ -51,13 +51,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c7388fde-4697-465d-b6f0-939cbbb4ce46",
+                            Id = "f3217fd1-643d-40c1-a144-747b0a7aa0f9",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b7887952-1ba1-4f93-be89-77c9ffe9d17d",
+                            Id = "fb29aad4-ba8c-42ff-bb3f-0dcbd5e52485",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -244,10 +244,6 @@ namespace SocialMediaServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Created_at")
                         .HasColumnType("datetime2");
 
@@ -258,9 +254,6 @@ namespace SocialMediaServer.Migrations
                     b.Property<string>("Group_name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -278,13 +271,10 @@ namespace SocialMediaServer.Migrations
                     b.Property<int>("GroupChatId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsLeft")
-                        .HasColumnType("bit");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Join_at")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Left_at")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -328,9 +318,6 @@ namespace SocialMediaServer.Migrations
 
                     b.Property<DateTime>("Sent_at")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -726,7 +713,7 @@ namespace SocialMediaServer.Migrations
             modelBuilder.Entity("SocialMediaServer.Models.GroupMessenge", b =>
                 {
                     b.HasOne("SocialMediaServer.Models.GroupChat", "groupChat")
-                        .WithMany("Messages")
+                        .WithMany()
                         .HasForeignKey("GroupChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -858,8 +845,6 @@ namespace SocialMediaServer.Migrations
             modelBuilder.Entity("SocialMediaServer.Models.GroupChat", b =>
                 {
                     b.Navigation("Members");
-
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.GroupMessenge", b =>

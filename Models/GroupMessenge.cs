@@ -12,9 +12,12 @@ public class GroupMessenge
 
     public string SenderId { get; set; }
     public User Sender { get; set; }
-    public bool isDelete {get; set;} = false;
+
     public int ReplyToId { get; set; }
     public GroupMessenge ReplyTo { get; set; }
     public DateTime Sent_at { get; set; } = DateTime.Now;
+
     public List<GroupMessenge> Replies { get; set; } = new List<GroupMessenge>();
+
+
 }
