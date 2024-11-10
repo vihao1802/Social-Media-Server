@@ -1,4 +1,6 @@
-using SocialMediaServer.DTOs.Request.GroupMember;
+using DTOs.Response;
+using SocialMediaServer.DTOs.Request.GroupChat;
+using SocialMediaServer.DTOs.Request.MediaContent;
 using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
 
@@ -6,48 +8,47 @@ namespace SocialMediaServer.Mappers
 {
     public static class GroupMemberMapper
     {
-        public static GroupMember GrMemberCreateDTOToGrMember(this GroupMemberCreateDTO grMemberCreateDTO)
+        public static MemberResponseDTO GroupMemberToGroupMemberResponseDTO(this GroupMember groupMember)
         {
-            if (grMemberCreateDTO == null)
-                throw new ArgumentNullException(nameof(grMemberCreateDTO), "GrMemberCreateDTO cannot be null");
+            if (groupMember == null)
+                throw new ArgumentNullException(nameof(groupMember), "groupMember cannot be null");
 
-            return new GroupMember
+            return new MemberResponseDTO
             {
-                GroupChatId = grMemberCreateDTO.GroupId,
-                UserId = grMemberCreateDTO.UserId
+                Id = groupMember.Id,
+                GroupChat = groupMember.GroupChat.GroupToGroupResponseDTO(),
+                User = groupMember.User.UserToUserResponseDTO(),
+                Join_at = groupMember.Join_at
             };
         }
 
-        public static GroupMemberResponseDTO GrMemberToGrMemberResponseDTO(this GroupMember grMember)
-        {
-            if (grMember == null)
-                throw new ArgumentNullException(nameof(grMember), "grMember cannot be null");
+        // public static GroupChat GroupChatUpdateDTOToGroupChat(this GroupUpdateDTO GroupChatUpdateDTO, GroupChat GroupChat)
+        // {
+        //     if (GroupChatUpdateDTO == null)
+        //         throw new ArgumentNullException(nameof(GroupChatUpdateDTO), "GroupChatUpdateDTO cannot be null");
 
-            var Group = grMember.GroupChat != null ? grMember.GroupChat.GrChatToGrChatResponseDTO()
-                                                  : new GroupChatResponseDTO { Id = grMember.GroupChatId };
+        //     GroupChat.Group_name = GroupChatUpdateDTO.Group_name;
+        //     GroupChat.Group_avt = GroupChatUpdateDTO.Group_avt;
+        //     GroupChat.AdminId = GroupChatUpdateDTO.AdminId;
 
-            var user = grMember.User != null ? grMember.User.UserToUserResponseDTO()
-                                            : new UserResponseDTO { Id = grMember.UserId };
+        //     return GroupChat;
+        // }
 
+        // public static Comment CommentPatchDTOToComment(this CommentPatchDTO commentPatchDTO, Comment comment)
+        // {
+        //     if (commentPatchDTO == null)
+        //         throw new ArgumentNullException(nameof(commentPatchDTO), "CommentPatchDTO cannot be null");
 
-            return new GroupMemberResponseDTO
-            {
-                Id = grMember.Id,
-                Group = Group,
-                User = user,
-                Join_at = grMember.Join_at
-            };
-        }
+        //     if (commentPatchDTO.Content != null)
+        //         comment.Content = commentPatchDTO.Content;
 
-        public static GroupMember GrMemberUpdateDTOToGrMember(this GroupMemberUpdateDTO grMembertUpdateDTO, GroupMember grMember)
-        {
-            if (grMembertUpdateDTO == null)
-                throw new ArgumentNullException(nameof(grMembertUpdateDTO), "GroupMemberUpdateDTO cannot be null");
+        //     if (commentPatchDTO.PostId != null)
+        //         comment.PostId = commentPatchDTO.PostId.Value;
 
-            grMember.UserId = grMembertUpdateDTO.UserId;
-            grMember.GroupChatId = grMembertUpdateDTO.GroupId;
+        //     if (commentPatchDTO.UserId != null)
+        //         comment.UserId = commentPatchDTO.UserId;
 
-            return grMember;
-        }
+        //     return comment;
+        // }
     }
 }

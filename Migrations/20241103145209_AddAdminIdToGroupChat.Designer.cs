@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaServer.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241103145209_AddAdminIdToGroupChat")]
+    partial class AddAdminIdToGroupChat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c7388fde-4697-465d-b6f0-939cbbb4ce46",
+                            Id = "f81e4dc9-6a73-40e8-93b3-2e059da29072",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b7887952-1ba1-4f93-be89-77c9ffe9d17d",
+                            Id = "284d9ca2-bf84-42aa-92b5-eaecb4f68036",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -259,9 +262,6 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
@@ -278,13 +278,7 @@ namespace SocialMediaServer.Migrations
                     b.Property<int>("GroupChatId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsLeft")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("Join_at")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Left_at")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
@@ -328,9 +322,6 @@ namespace SocialMediaServer.Migrations
 
                     b.Property<DateTime>("Sent_at")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("isDelete")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
