@@ -7,7 +7,7 @@
 namespace SocialMediaServer.Migrations
 {
     /// <inheritdoc />
-    public partial class initToBulky : Migration
+    public partial class mess3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,30 +15,28 @@ namespace SocialMediaServer.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "bd4be22f-b176-42ab-bf5c-bf970f1554cd");
+                keyValue: "73273901-7ae5-4db1-a9cf-a49fbec0719b");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "bf2ce92d-0ec3-4a33-8d0f-9f0c926213f0");
+                keyValue: "74afaa44-d66a-48b9-b8a2-73648730cee0");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Bio",
-                table: "AspNetUsers",
-                type: "nvarchar(100)",
-                maxLength: 100,
+            migrationBuilder.AlterColumn<int>(
+                name: "ReplyToId",
+                table: "Messenges",
+                type: "int",
                 nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
+                oldClrType: typeof(int),
+                oldType: "int");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0c83d767-5c0d-49bd-9c4b-77ef50659bd7", null, "User", "USER" },
-                    { "39875189-8e19-45b4-a52a-5372721e963d", null, "Admin", "ADMIN" }
+                    { "1b5f7ff6-0e09-432e-80dd-5834d4c588be", null, "User", "USER" },
+                    { "81e9d498-e663-43b9-b526-19355b9eb0d7", null, "Admin", "ADMIN" }
                 });
         }
 
@@ -48,21 +46,21 @@ namespace SocialMediaServer.Migrations
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "0c83d767-5c0d-49bd-9c4b-77ef50659bd7");
+                keyValue: "1b5f7ff6-0e09-432e-80dd-5834d4c588be");
 
             migrationBuilder.DeleteData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
-                keyValue: "39875189-8e19-45b4-a52a-5372721e963d");
+                keyValue: "81e9d498-e663-43b9-b526-19355b9eb0d7");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Bio",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100,
+            migrationBuilder.AlterColumn<int>(
+                name: "ReplyToId",
+                table: "Messenges",
+                type: "int",
+                nullable: false,
+                defaultValue: 0,
+                oldClrType: typeof(int),
+                oldType: "int",
                 oldNullable: true);
 
             migrationBuilder.InsertData(
@@ -70,8 +68,8 @@ namespace SocialMediaServer.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "bd4be22f-b176-42ab-bf5c-bf970f1554cd", null, "Admin", "ADMIN" },
-                    { "bf2ce92d-0ec3-4a33-8d0f-9f0c926213f0", null, "User", "USER" }
+                    { "73273901-7ae5-4db1-a9cf-a49fbec0719b", null, "User", "USER" },
+                    { "74afaa44-d66a-48b9-b8a2-73648730cee0", null, "Admin", "ADMIN" }
                 });
         }
     }

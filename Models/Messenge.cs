@@ -12,8 +12,11 @@ public class Messenge
     public string ReceiverId { get; set; }
     public User Receiver { get; set; }
 
-    public int ReplyToId { get; set; }
+    public int? ReplyToId { get; set; }
     public Messenge ReplyTo { get; set; }
+
+    public int RelationshipId {get; set;}
+    public Relationship Relationship {get; set;}
 
     public List<Messenge> Replies { get; set; } = new List<Messenge>();
 

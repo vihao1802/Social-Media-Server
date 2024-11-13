@@ -94,6 +94,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IMessengeRepository, MessengeRepository>();
+builder.Services.AddScoped<IMessengeService, MessengeService>();
+builder.Services.AddScoped<IMessengeMediaContent, MessengeMediaContentRepository>();
+
+
+
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
@@ -106,6 +112,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReactionRepository, CommentReactionRepository>();
 builder.Services.AddScoped<ICommentReactionService, CommentReactionService>();
+builder.Services.AddScoped<IMessengeFileService, MessengeFileService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -134,6 +141,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+// Để đó sẽ cần dùng đến messenge
+app.UseWebSockets();
 
 app.MapControllers();
 

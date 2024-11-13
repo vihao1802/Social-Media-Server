@@ -372,7 +372,10 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ReplyToId")
+                    b.Property<int>("RelationshipId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToId")
                         .HasColumnType("int");
 
                     b.Property<string>("SenderId")
@@ -385,6 +388,8 @@ namespace SocialMediaServer.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("ReceiverId");
+
+                    b.HasIndex("RelationshipId");
 
                     b.HasIndex("ReplyToId");
 
@@ -756,11 +761,16 @@ namespace SocialMediaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SocialMediaServer.Models.Relationship", "Relationship")
+                        .WithMany()
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SocialMediaServer.Models.Messenge", "ReplyTo")
                         .WithMany("Replies")
                         .HasForeignKey("ReplyToId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialMediaServer.Models.User", "Sender")
                         .WithMany("MessengeSent")
@@ -769,6 +779,8 @@ namespace SocialMediaServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Receiver");
+
+                    b.Navigation("Relationship");
 
                     b.Navigation("ReplyTo");
 

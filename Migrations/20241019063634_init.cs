@@ -33,7 +33,7 @@ namespace SocialMediaServer.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Profile_img = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Bio = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<byte>(type: "TINYINT", nullable: false),
@@ -180,40 +180,6 @@ namespace SocialMediaServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messenges",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Sent_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReplyToId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messenges", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_Messenges_AspNetUsers_ReceiverId",
-                        column: x => x.ReceiverId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Messenges_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Messenges_Messenges_ReplyToId",
-                        column: x => x.ReplyToId,
-                        principalTable: "Messenges",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Posts",
                 columns: table => new
                 {
@@ -329,27 +295,6 @@ namespace SocialMediaServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MessengeMediaContents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Media_url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Media_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessengeId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MessengeMediaContents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MessengeMediaContents_Messenges_MessengeId",
-                        column: x => x.MessengeId,
-                        principalTable: "Messenges",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -433,6 +378,47 @@ namespace SocialMediaServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messenges",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Sent_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReplyToId = table.Column<int>(type: "int", nullable: false),
+                    RelationshipId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messenges", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Messenges_AspNetUsers_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messenges_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Messenges_Messenges_ReplyToId",
+                        column: x => x.ReplyToId,
+                        principalTable: "Messenges",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_Messenges_Relationships_RelationshipId",
+                        column: x => x.RelationshipId,
+                        principalTable: "Relationships",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CommentReactions",
                 columns: table => new
                 {
@@ -459,13 +445,34 @@ namespace SocialMediaServer.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MessengeMediaContents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Media_url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Media_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MessengeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessengeMediaContents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MessengeMediaContents_Messenges_MessengeId",
+                        column: x => x.MessengeId,
+                        principalTable: "Messenges",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "bd4be22f-b176-42ab-bf5c-bf970f1554cd", null, "Admin", "ADMIN" },
-                    { "bf2ce92d-0ec3-4a33-8d0f-9f0c926213f0", null, "User", "USER" }
+                    { "73273901-7ae5-4db1-a9cf-a49fbec0719b", null, "User", "USER" },
+                    { "74afaa44-d66a-48b9-b8a2-73648730cee0", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -573,6 +580,11 @@ namespace SocialMediaServer.Migrations
                 column: "ReceiverId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messenges_RelationshipId",
+                table: "Messenges",
+                column: "RelationshipId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messenges_ReplyToId",
                 table: "Messenges",
                 column: "ReplyToId");
@@ -645,9 +657,6 @@ namespace SocialMediaServer.Migrations
                 name: "PostViewers");
 
             migrationBuilder.DropTable(
-                name: "Relationships");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -661,6 +670,9 @@ namespace SocialMediaServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Posts");
+
+            migrationBuilder.DropTable(
+                name: "Relationships");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

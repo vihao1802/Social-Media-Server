@@ -15,5 +15,9 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task DeleteRelationship(Relationship relationship);
         Task<Relationship> GetRelationshipBetweenSenderAndReceiver(string sender_id, string receiver_id);
         Task ChangeRelationshipType(Relationship r);
+
+
+        // Sử dụng cho messenge
+        Task<Relationship> GetRelationshipById(int relationShipId);
     }
 }

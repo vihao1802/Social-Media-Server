@@ -12,8 +12,8 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241014070344_initToBulky")]
-    partial class initToBulky
+    [Migration("20241019063634_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "39875189-8e19-45b4-a52a-5372721e963d",
+                            Id = "74afaa44-d66a-48b9-b8a2-73648730cee0",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "0c83d767-5c0d-49bd-9c4b-77ef50659bd7",
+                            Id = "73273901-7ae5-4db1-a9cf-a49fbec0719b",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -375,6 +375,9 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("RelationshipId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ReplyToId")
                         .HasColumnType("int");
 
@@ -388,6 +391,8 @@ namespace SocialMediaServer.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("ReceiverId");
+
+                    b.HasIndex("RelationshipId");
 
                     b.HasIndex("ReplyToId");
 
@@ -759,6 +764,12 @@ namespace SocialMediaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SocialMediaServer.Models.Relationship", "Relationship")
+                        .WithMany()
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SocialMediaServer.Models.Messenge", "ReplyTo")
                         .WithMany("Replies")
                         .HasForeignKey("ReplyToId")
@@ -772,6 +783,8 @@ namespace SocialMediaServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Receiver");
+
+                    b.Navigation("Relationship");
 
                     b.Navigation("ReplyTo");
 

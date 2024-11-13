@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
@@ -82,5 +83,14 @@ namespace SocialMediaServer.Repositories.Implementations
             return r.Entity;
         }
 
+
+        public async Task<Relationship> GetRelationshipById(int relationshipId){
+            var r = await _dbContext.Relationships.FindAsync(relationshipId); 
+            if (r == null){
+                return null;
+            }
+
+            return r;
+        }
     }
 }

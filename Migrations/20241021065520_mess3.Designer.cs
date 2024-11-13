@@ -12,8 +12,8 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241012152533_init")]
-    partial class init
+    [Migration("20241021065520_mess3")]
+    partial class mess3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bd4be22f-b176-42ab-bf5c-bf970f1554cd",
+                            Id = "81e9d498-e663-43b9-b526-19355b9eb0d7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "bf2ce92d-0ec3-4a33-8d0f-9f0c926213f0",
+                            Id = "1b5f7ff6-0e09-432e-80dd-5834d4c588be",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -375,7 +375,10 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ReplyToId")
+                    b.Property<int>("RelationshipId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReplyToId")
                         .HasColumnType("int");
 
                     b.Property<string>("SenderId")
@@ -388,6 +391,8 @@ namespace SocialMediaServer.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("ReceiverId");
+
+                    b.HasIndex("RelationshipId");
 
                     b.HasIndex("ReplyToId");
 
@@ -524,7 +529,8 @@ namespace SocialMediaServer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -758,11 +764,16 @@ namespace SocialMediaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SocialMediaServer.Models.Relationship", "Relationship")
+                        .WithMany()
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SocialMediaServer.Models.Messenge", "ReplyTo")
                         .WithMany("Replies")
                         .HasForeignKey("ReplyToId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialMediaServer.Models.User", "Sender")
                         .WithMany("MessengeSent")
@@ -771,6 +782,8 @@ namespace SocialMediaServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Receiver");
+
+                    b.Navigation("Relationship");
 
                     b.Navigation("ReplyTo");
 
