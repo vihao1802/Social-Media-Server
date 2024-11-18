@@ -24,6 +24,9 @@ public class ApplicationDBContext : IdentityDbContext<User>
     public DbSet<GroupMessenge> GroupMessenges { get; set; }
     public DbSet<Messenge> Messenges { get; set; }
     public DbSet<MessengeMediaContent> MessengeMediaContents { get; set; }
+    public DbSet<MessageReaction> MessageReactions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -138,6 +141,24 @@ public class ApplicationDBContext : IdentityDbContext<User>
             .WithMany(u => u.MediaContents) // A User can receive many Messages
             .HasForeignKey(m => m.MessengeId) // The foreign key is UserId
             .OnDelete(DeleteBehavior.Cascade); // Allow cascading deletes
+
+        // Cấu hình quan hệ cho MessageReaction
+        modelBuilder.Entity<MessageReaction>()
+            .HasOne(mr => mr.GroupMessage)
+            .WithMany(gm => gm.Reactions) // GroupMessenge có nhiều Reactions
+            .HasForeignKey(mr => mr.GroupMessageId)
+            .OnDelete(DeleteBehavior.Cascade); // Xóa tin nhắn thì xóa luôn reactions của tin nhắn đó
+
+        modelBuilder.Entity<MessageReaction>()
+            .HasOne(mr => mr.User)
+            .WithMany(u => u.Reactions) // User có nhiều Reactions
+            .HasForeignKey(mr => mr.UserId)
+            .OnDelete(DeleteBehavior.Cascade); // Xóa người dùng thì xóa luôn reactions của họ
+        modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Group) // Một thông báo liên kết với một nhóm
+                .WithMany(g => g.Notifications) // Một nhóm có nhiều thông báo
+                .HasForeignKey(n => n.GroupId) // Khóa ngoại
+                .OnDelete(DeleteBehavior.Cascade); // Khi xóa nhóm thì xóa thông báo
 
         List<IdentityRole> roles = new List<IdentityRole>
             {
