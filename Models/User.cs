@@ -30,5 +30,6 @@ namespace SocialMediaServer.Models
 
         public List<Messenge> MessengeSent { get; set; } = new List<Messenge>();
         public List<Messenge> MessengeReceived { get; set; } = new List<Messenge>();
+        public List<MessageReaction> Reactions { get; set; } = new List<MessageReaction>();
     }
 }

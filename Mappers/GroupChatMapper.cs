@@ -30,5 +30,16 @@ namespace SocialMediaServer.Mappers
                 Group_avt = grChatCreateDTO.avatar
             };
         }
+
+        public static GroupChat GroupChatUpdateDTOToGroupChat(this UpdateGrChatDTO GroupChatUpdateDTO, GroupChat GroupChat)
+        {
+            if (GroupChatUpdateDTO == null)
+                throw new ArgumentNullException(nameof(GroupChatUpdateDTO), "GroupChatUpdateDTO cannot be null");
+
+            GroupChat.Group_name = GroupChatUpdateDTO.Group_name;
+            GroupChat.Group_avt = GroupChatUpdateDTO.Group_avt;
+
+            return GroupChat;
+        }
     }
 }

@@ -26,6 +26,13 @@ namespace SocialMediaServer.Controllers
             return Ok(groupChats);
         }
 
+        [HttpGet("GetAllByUser/{userId}")]
+        public async Task<IActionResult> GetAllByUsers([FromQuery] GroupChatQueryDTO groupChatQueryDTO, string userId)
+        {
+            var groupChats = await _groupChatService.GetAllByUserAsync(groupChatQueryDTO,userId);
+            return Ok(groupChats);
+        }
+
         [HttpGet("GetById/{groupChatId}")]
         public async Task<IActionResult> GetGroupChatById(int groupChatId)
         {
@@ -41,14 +48,14 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateGroupChat([FromBody] GroupChatCreateDTO groupChatCreateDTO)
+        public async Task<IActionResult> CreateGroupChat([FromForm] GroupChatCreateDTO groupChatCreateDTO,IFormFile? mediaFile)
         {
-            var createdGroupChat = await _groupChatService.CreateAsync(groupChatCreateDTO);
+            var createdGroupChat = await _groupChatService.CreateAsync(groupChatCreateDTO, mediaFile);
             return CreatedAtAction(nameof(GetGroupChatById), new { groupChatId = createdGroupChat.Id }, createdGroupChat);
         }
 
         [HttpPut("Update/{groupChatId}")]
-        public async Task<IActionResult> UpdateGroupChat([FromBody] UpdateGrChatDTO groupChatUpdateDTO, int groupChatId)
+        public async Task<IActionResult> UpdateGroupChat([FromForm] UpdateGrChatDTO groupChatUpdateDTO, int groupChatId)
         {
             try
             {
@@ -62,7 +69,6 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPut("TransferAdmin/{groupChatId}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TransferAdmin(int groupChatId, [FromBody] TransferAdminDTO transferAdminDTO)
         {
             try
@@ -83,6 +89,20 @@ namespace SocialMediaServer.Controllers
             try
             {
                 await _groupChatService.DeleteAsync(groupChatId);
+                return NoContent();
+            }
+            catch (AppError ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("Disband/{groupChatId}")]
+        public async Task<IActionResult> DisbandGroupChat(int groupChatId)
+        {
+            try
+            {
+                await _groupChatService.DeleteGrAsync(groupChatId);
                 return NoContent();
             }
             catch (AppError ex)

@@ -6,7 +6,7 @@ namespace SocialMediaServer.DTOs.Request.GroupChat
         
         public string? Content {get; set;} = string.Empty;
         
-        public string? MediaContent {get; set;} = string.Empty;
+        public string? Media_content {get; set;} = string.Empty;
         
         public int? GroupId {get; set;}
         

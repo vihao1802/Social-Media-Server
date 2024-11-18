@@ -72,6 +72,24 @@ namespace SocialMediaServer.Controllers
             }
         }
 
+        [HttpDelete]
+        [Route("Recall/{id}")]
+        public async Task<IActionResult> RecallAsync(int id)
+        {
+            try
+            {
+                var success = await _groupMessengeService.RecallAsync(id);
+                if (success)
+                    return NoContent();
+                else
+                    return NotFound("Message not found");
+            }
+            catch (AppError ex)
+            {
+                return StatusCode(ex.StatusCode, ex.Message);
+            }
+        }
+
         [HttpGet]
         [Route("GetAllByGroupId/{groupId}")]
         public async Task<IActionResult> GetAllByGroupIdAsync(int groupId, [FromQuery] GrMessQueryDTO grMessQueryDTO)

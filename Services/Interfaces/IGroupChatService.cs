@@ -16,10 +16,12 @@ namespace SocialMediaServer.Services.Interfaces
     {
         Task<List<GroupChatResponseDTO>> SearchForNames(string search_string);
         Task<GroupChatResponseDTO> GetByIdAsync(int id);
-        Task<PaginatedResult<GroupChatResponseDTO>> GetAllAsync(GroupChatQueryDTO postQueryDTO);
-        Task<GroupChatResponseDTO> CreateAsync(GroupChatCreateDTO postCreateDTO);
+        Task<PaginatedResult<GroupChatResponseDTO>> GetAllAsync(GroupChatQueryDTO grChatQueryDTO);
+        Task<PaginatedResult<GroupChatResponseDTO>> GetAllByUserAsync(GroupChatQueryDTO grChatQueryDTO, string userId);
+        Task<GroupChatResponseDTO> CreateAsync(GroupChatCreateDTO postCreateDTO, IFormFile? mediaFile);
         Task<GroupChatResponseDTO> UpdateAsync(UpdateGrChatDTO updateDto, int id);
         Task<bool> DeleteAsync(int id);
+        Task<bool> DeleteGrAsync(int id);
         Task TransferAdminAsync(int groupChatId, string newAdminId);
     }
 }

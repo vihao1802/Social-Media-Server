@@ -113,6 +113,14 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReactionRepository, CommentReactionRepository>();
 builder.Services.AddScoped<ICommentReactionService, CommentReactionService>();
 builder.Services.AddScoped<IMessengeFileService, MessengeFileService>();
+builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
+builder.Services.AddScoped<IGroupChatService, GroupChatService>();
+builder.Services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
+builder.Services.AddScoped<IGroupMemberService, GroupMemberService>();
+builder.Services.AddScoped<IGroupMessengeRepository, GroupMessengeRepository>();
+builder.Services.AddScoped<IGroupMessengeService, GroupMessengeService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IMessageReactionRepository, MessageReactionRepository>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {

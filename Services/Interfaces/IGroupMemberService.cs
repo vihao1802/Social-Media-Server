@@ -14,5 +14,6 @@ namespace SocialMediaServer.Services.Interfaces
         Task<GroupMemberResponseDTO> CreateAsync(GroupMemberCreateDTO grMemberCreateDTO);
         Task<GroupMemberResponseDTO> UpdateAsync(GroupMemberUpdateDTO grMemberUpdateDTO, int id);
         Task<bool> DeleteAsync(int id);
+        Task<bool> OutGroupAsync(int id);
     }
 }

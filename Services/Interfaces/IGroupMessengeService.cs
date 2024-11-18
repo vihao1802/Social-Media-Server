@@ -10,6 +10,7 @@ namespace SocialMediaServer.Services.Interfaces
         Task<PaginatedResult<GrMessResponseDTO>> GetAllByGroupIdAsync(int groupId, GrMessQueryDTO grMessQueryDTO);
         Task<GrMessResponseDTO> CreateAsync(GrMessCreateDTO grMessCreateDTO);
         Task<bool> DeleteAsync(int id);
+        Task<bool> RecallAsync(int id);
         Task<bool> DeleteAllByGroupIdAsync(int groupId);
     }
 }
