@@ -66,6 +66,8 @@ namespace SocialMediaServer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Group_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Group_avt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AdminId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isDelete = table.Column<bool>(type: "bit", nullable: false),
                     Created_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -237,10 +239,13 @@ namespace SocialMediaServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
                     GroupChatId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Join_at = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Join_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isDelete = table.Column<bool>(type: "bit", nullable: false),
+                    isLeft = table.Column<bool>(type: "bit", nullable: false),
+                    Left_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isTurnOff = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -268,8 +273,9 @@ namespace SocialMediaServer.Migrations
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Media_content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GroupChatId = table.Column<int>(type: "int", nullable: false),
+                    isDelete = table.Column<bool>(type: "bit", nullable: false),
                     SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReplyToId = table.Column<int>(type: "int", nullable: false),
+                    ReplyToId = table.Column<int>(type: "int", nullable: true),
                     Sent_at = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -289,6 +295,27 @@ namespace SocialMediaServer.Migrations
                     table.ForeignKey(
                         name: "FK_GroupMessenges_Groups_GroupChatId",
                         column: x => x.GroupChatId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Groups_GroupId",
+                        column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -330,7 +357,7 @@ namespace SocialMediaServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MediaContent",
+                name: "MediaContents",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -341,9 +368,9 @@ namespace SocialMediaServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MediaContent", x => x.Id);
+                    table.PrimaryKey("PK_MediaContents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MediaContent_Posts_PostId",
+                        name: "FK_MediaContents_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
@@ -387,7 +414,7 @@ namespace SocialMediaServer.Migrations
                     Sent_at = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ReceiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ReplyToId = table.Column<int>(type: "int", nullable: false),
+                    ReplyToId = table.Column<int>(type: "int", nullable: true),
                     RelationshipId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -414,6 +441,34 @@ namespace SocialMediaServer.Migrations
                         name: "FK_Messenges_Relationships_RelationshipId",
                         column: x => x.RelationshipId,
                         principalTable: "Relationships",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MessageReactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GroupMessageId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ReactionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReactedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageReactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MessageReactions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MessageReactions_GroupMessenges_GroupMessageId",
+                        column: x => x.GroupMessageId,
+                        principalTable: "GroupMessenges",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -471,8 +526,8 @@ namespace SocialMediaServer.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "73273901-7ae5-4db1-a9cf-a49fbec0719b", null, "User", "USER" },
-                    { "74afaa44-d66a-48b9-b8a2-73648730cee0", null, "Admin", "ADMIN" }
+                    { "7da28442-621f-4ad7-a951-f52a97735ff3", null, "Admin", "ADMIN" },
+                    { "ecf828bd-6d06-4181-923f-1b3e4d519584", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -565,9 +620,19 @@ namespace SocialMediaServer.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MediaContent_PostId",
-                table: "MediaContent",
+                name: "IX_MediaContents_PostId",
+                table: "MediaContents",
                 column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageReactions_GroupMessageId",
+                table: "MessageReactions",
+                column: "GroupMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MessageReactions_UserId",
+                table: "MessageReactions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MessengeMediaContents_MessengeId",
@@ -593,6 +658,11 @@ namespace SocialMediaServer.Migrations
                 name: "IX_Messenges_SenderId",
                 table: "Messenges",
                 column: "SenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_GroupId",
+                table: "Notifications",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_CreatorId",
@@ -645,13 +715,16 @@ namespace SocialMediaServer.Migrations
                 name: "GroupMembers");
 
             migrationBuilder.DropTable(
-                name: "GroupMessenges");
+                name: "MediaContents");
 
             migrationBuilder.DropTable(
-                name: "MediaContent");
+                name: "MessageReactions");
 
             migrationBuilder.DropTable(
                 name: "MessengeMediaContents");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "PostViewers");
@@ -663,13 +736,16 @@ namespace SocialMediaServer.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "GroupMessenges");
 
             migrationBuilder.DropTable(
                 name: "Messenges");
 
             migrationBuilder.DropTable(
                 name: "Posts");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Relationships");
