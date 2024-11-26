@@ -98,6 +98,22 @@ namespace SocialMediaServer.Repositories.Implementations
             return await postsQuery;
         }
 
+        public async Task<List<Post>> GetAllStoriesOnlyFriendByUserIdAsync(string userId, PostQueryDTO postQueryDTO)
+        {
+           
+            var posts = _dbContext.Posts
+                .Where(post => post.CreatorId == userId && 
+                        (post.Visibility == Visibility.Public || post.Visibility == Visibility.FriendsOnly) &&
+                        post.Is_story == true);
+
+            foreach (var post in posts)
+            {
+                post.Creator = _dbContext.Users.FirstOrDefault(u => u.Id == post.CreatorId);
+            }
+
+            return await posts.ToListAsync();
+        }
+
         public async Task<PaginatedResult<Post>> GetAllPostsByMeAsync(string meId, PostQueryDTO postQueryDTO)
         {
             var filterParams = new Dictionary<string, object?>

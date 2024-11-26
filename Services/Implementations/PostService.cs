@@ -82,6 +82,43 @@ namespace SocialMediaServer.Services.Implementations
             return listPostsDto;
         }
 
+        public async Task<List<PostResponseDTO>> GetAllStoryFriendAsync(PostQueryDTO postQueryDTO)
+        {
+            var userLogin = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userLogin))
+                throw new AppError("You are not authorized to see this content!", 401);
+
+            var listUserFollower = await _relationshipRepository.GetUserFollowing(userLogin);
+
+            List<Post> postFriends = new List<Post>();
+
+            foreach (var user in listUserFollower)
+            {
+                if (user != null)
+                {
+                    // Kiểm tra quan hệ bạn bè hai chiều (mutual follow)
+                    var relationshipUserView_User = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(userLogin, user.ReceiverId);
+                    
+
+                    if (relationshipUserView_User?.Relationship_type == RelationshipType.Follow)
+                    {
+                        // Lấy bài viết dạng story của người dùng
+                        var posts = await _postRepository.GetAllStoriesOnlyFriendByUserIdAsync(user.ReceiverId, postQueryDTO);
+                        if (posts != null)
+                            postFriends.AddRange(posts); // Thêm tất cả bài viết
+                    }
+                }
+            }
+
+            if (!postFriends.Any())
+                return new List<PostResponseDTO>();
+
+            var listPostsDto = postFriends.Select(post => post.PostToPostResponseDTO()).ToList();
+
+            return listPostsDto;
+        }
+
         public async Task<PaginatedResult<PostResponseDTO>> GetAllByUserIdAsync(string userViewId, PostQueryDTO postQueryDTO)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
