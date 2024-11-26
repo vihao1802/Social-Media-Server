@@ -1,4 +1,6 @@
 ﻿using DTOs.Response;
+using Microsoft.EntityFrameworkCore;
+using SocialMediaServer.Data;
 using SocialMediaServer.DTOs.Request.Post;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Mappers;
@@ -16,14 +18,17 @@ namespace SocialMediaServer.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IRelationshipRepository _relationshipRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationDBContext _dBContext;
 
         public PostService(IPostRepository postRepository, IUserRepository userRepository,
-            IHttpContextAccessor httpContextAccessor, IRelationshipRepository relationshipRepository)
+            IHttpContextAccessor httpContextAccessor, IRelationshipRepository relationshipRepository,
+            ApplicationDBContext dBContext)
         {
             _postRepository = postRepository;
             _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;
             _relationshipRepository = relationshipRepository;
+            _dBContext = dBContext;
         }
 
         public async Task<PaginatedResult<PostResponseDTO>> GetAllAsync(PostQueryDTO postQueryDTO)
@@ -31,6 +36,21 @@ namespace SocialMediaServer.Services.Implementations
             var posts = await _postRepository.GetAllPostsAsync(postQueryDTO);
 
             var listPostsDto = posts.Items.Select(post => post.PostToPostResponseDTO()).ToList();
+
+            var postIds = listPostsDto.Select(postDto => postDto.Id).ToList();
+
+            // Truy vấn số lượng PostReactions cho tất cả bài viết trong một lần
+            var postReactions = await _dBContext.PostViewers
+                .Where(pv => postIds.Contains(pv.PostId))
+                .GroupBy(pv => pv.PostId)
+                .Select(group => new { PostId = group.Key, ReactionCount = group.Count() })
+                .ToDictionaryAsync(x => x.PostId, x => x.ReactionCount);
+
+            // Gán PostReactions vào từng PostResponseDTO
+            foreach (var postDto in listPostsDto)
+            {
+                postDto.PostReactions = postReactions.ContainsKey(postDto.Id) ? postReactions[postDto.Id] : 0;
+            }
 
             return new PaginatedResult<PostResponseDTO>(
                 listPostsDto,

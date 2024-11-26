@@ -11,5 +11,7 @@ namespace DTOs.Response
         public bool Is_story { get; set; } = false;
         public DateTime Create_at { get; set; } = DateTime.Now;
         public UserResponseDTO Creator { get; set; }
+
+        public int PostReactions { get; set; }
     }
 }
