@@ -19,7 +19,7 @@ using SocialMediaServer.Services.Interfaces;
 
 namespace SocialMediaServer.Controllers
 {
-    [Route("auth")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController(IAuthService AuthService, IUserService userService, ITokenService tokenService) : ControllerBase
     {
