@@ -11,6 +11,7 @@ namespace SocialMediaServer.Repositories.Interfaces
     {
        Task<PaginatedResult<Post>> GetAllPostsAsync(PostQueryDTO postQueryDTO);
        Task<PaginatedResult<Post>> GetAllPostsPublicByUserIdAsync(string userId, PostQueryDTO postQueryDTO);
+       Task<List<Post>> GetAllStoriesOnlyFriendByUserIdAsync(string userId, PostQueryDTO postQueryDTO);
        Task<PaginatedResult<Post>> GetAllPostsOnlyFriendByUserIdAsync(string userId, PostQueryDTO postQueryDTO);
        Task<PaginatedResult<Post>> GetAllPostsByMeAsync(string meId, PostQueryDTO postQueryDTO);
        Task<Post> GetByIdAsync(int id);
