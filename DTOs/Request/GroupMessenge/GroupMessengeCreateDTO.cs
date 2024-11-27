@@ -4,8 +4,7 @@ namespace SocialMediaServer.DTOs.Request.GroupMess
 {
     public class GrMessCreateDTO
 {
-    [Required]
-    public string Content { get; set; } = string.Empty;
+    public string? Content { get; set; }
     public string? MediaContent { get; set; }
     [Required]
     public int GroupId { get; set; }

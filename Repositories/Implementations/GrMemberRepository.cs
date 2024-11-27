@@ -136,11 +136,9 @@ public class GroupMemberRepository : IGroupMemberRepository
             .AnyAsync(grMember => grMember.GroupChatId == groupChatId && grMember.UserId == userId && !grMember.isDelete && !grMember.isLeft);
     }
 
-    public async Task<GroupMember> GetByGroupAndUser(int groupChatId, string userId)
+    public async Task<GroupMember?> GetByGroupAndUser(int groupChatId, string userId)
     {
-        var grMember = await _dbContext.GroupMembers.FirstOrDefaultAsync(p => p.GroupChatId == groupChatId && p.UserId == userId)
-                ?? throw new AppError("Member not found", 404);
-            
+        var grMember = await _dbContext.GroupMembers.FirstOrDefaultAsync(p => p.GroupChatId == groupChatId && p.UserId == userId);
         return grMember;
     }
 }

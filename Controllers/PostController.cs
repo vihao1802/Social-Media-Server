@@ -36,6 +36,13 @@ namespace SocialMediaServer.Controllers
             return Ok(posts);
         }
 
+        [HttpGet("stories")]
+        public async Task<IActionResult> GetAllStoryFriend([FromQuery] PostQueryDTO postQueryDTO)
+        {
+            var posts = await _postService.GetAllStoryFriendAsync(postQueryDTO);
+            return Ok(posts);
+        }
+
         [HttpGet("{post_id}")]
         public async Task<IActionResult> GetPostById(int post_id)
         {
