@@ -5,8 +5,8 @@ public class GroupMessenge
 {
     public int Id { get; set; }
 
-    public string Content { get; set; } = string.Empty;
-    public string Media_content { get; set; } = string.Empty;
+    public string? Content { get; set; } = string.Empty;
+    public string? Media_content { get; set; } = string.Empty;
     public int GroupChatId { get; set; }
     public GroupChat groupChat { get; set; }
     public bool isDelete {get;set;} = false;
