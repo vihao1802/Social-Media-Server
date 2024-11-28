@@ -19,15 +19,17 @@ namespace SocialMediaServer.Services.Implementations
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMediaService _mediaService;
 
-        public MediaContentService(IMediaContentRepository mediaContentRepository, 
-            IPostRepository postRepository, IHttpContextAccessor httpContextAccessor, 
-            IMediaService mediaService, IUserRepository userRepository)
+        private readonly ILogger<MediaContentService> _logger;
+        public MediaContentService(IMediaContentRepository mediaContentRepository,
+            IPostRepository postRepository, IHttpContextAccessor httpContextAccessor,
+            IMediaService mediaService, IUserRepository userRepository, ILogger<MediaContentService> logger)
         {
             _mediaContentRepository = mediaContentRepository;
             _postRepository = postRepository;
             _httpContextAccessor = httpContextAccessor;
             _mediaService = mediaService;
             _userRepository = userRepository;
+            _logger = logger;
         }
 
         public async Task<PaginatedResult<MediaContentResponseDTO>> GetAllAsync(MediaContentQueryDTO mediaContentQueryDTO)
@@ -46,7 +48,7 @@ namespace SocialMediaServer.Services.Implementations
         public async Task<PaginatedResult<MediaContentResponseDTO>> GetAllByPostIdAsync(int postId, MediaContentQueryDTO mediaContentQueryDTO)
         {
             var mediaContents = await _mediaContentRepository.GetAllMediaContentByPostIdAsync(postId, mediaContentQueryDTO);
-            var listMediaContentsDto = mediaContents.Items.Select(mediaContent => 
+            var listMediaContentsDto = mediaContents.Items.Select(mediaContent =>
             mediaContent.MediaContentToMediaContentResponseDTO()).ToList();
 
             return new PaginatedResult<MediaContentResponseDTO>(
@@ -63,15 +65,17 @@ namespace SocialMediaServer.Services.Implementations
             return mediaContent.MediaContentToMediaContentResponseDTO();
         }
 
-        public async Task<MediaContentResponseDTO> CreateAsync(MediaContentCreateDTO mediaContentCreateDTO, 
+        public async Task<MediaContentResponseDTO> CreateAsync(MediaContentCreateDTO mediaContentCreateDTO,
             IFormFile mediaFile)
-        {   
+        {
             if (mediaFile == null || mediaFile.Length == 0)
             {
                 throw new AppError("Media file is required", 400);
-            }    
+            }
 
+            // _logger.LogInformation("mediaContentCreateDTO-------------------------: {Post}", mediaContentCreateDTO.ToString());
             var post = await _postRepository.GetByIdAsync(mediaContentCreateDTO.PostId);
+
             if (post == null)
                 throw new AppError("Post not found", 404);
 
@@ -112,7 +116,7 @@ namespace SocialMediaServer.Services.Implementations
             return mediaContentUpdated.MediaContentToMediaContentResponseDTO();
         }
 
-        public async Task<MediaContentResponseDTO> PatchAsync(MediaContentPatchDTO mediaContentPatchDTO, 
+        public async Task<MediaContentResponseDTO> PatchAsync(MediaContentPatchDTO mediaContentPatchDTO,
             int id, IFormFile? mediaFile)
         {
             var mediaContentToUpdate = await _mediaContentRepository.GetByIdAsync(id)
