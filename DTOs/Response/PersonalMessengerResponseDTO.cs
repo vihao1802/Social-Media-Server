@@ -16,5 +16,7 @@ namespace SocialMediaServer.DTOs.Response
         public string Latest_message { get; set; }
 
         public DateTime? Message_created_at { get; set; }
+
+        public int relationshipId { get; set; }
     }
 }

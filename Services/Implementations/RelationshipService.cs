@@ -149,9 +149,8 @@ namespace SocialMediaServer.Services.Implementations
 
             foreach (var r in list_following_follower)
             {
-                Console.WriteLine(r.Id);
                 var messengerDto = new PersonalMessengerResponseDTO();
-
+                messengerDto.relationshipId = r.Id;
                 // Determine messenger
                 if (r.SenderId.Equals(user_id))
                 {
