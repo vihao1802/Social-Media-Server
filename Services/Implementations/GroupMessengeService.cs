@@ -32,6 +32,9 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task<GrMessResponseDTO> CreateAsync(GrMessCreateDTO grMessCreateDTO)
         {
+            if(grMessCreateDTO.Content == null && grMessCreateDTO.MediaFile == null)
+                throw new AppError("Data null", 404);
+            
             var group = await _groupChatRepository.GetByIdAsync(grMessCreateDTO.GroupId);
 
             if (group == null)
