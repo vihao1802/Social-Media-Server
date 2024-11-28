@@ -134,5 +134,16 @@ namespace SocialMediaServer.Controllers
             return NoContent();
 
         }
+
+        [HttpGet("me/personal-messenger")]
+        public async Task<IActionResult> GetCurrentUserPersonalMessenger()
+        {
+            var userClaims = await _userService.GetCurrentUser(User);
+
+            var list_following = await _relationshipService.GetCurrentUserPersonalMessenger(userClaims.Id.ToString());
+
+            return Ok(list_following);
+
+        }
     }
 }

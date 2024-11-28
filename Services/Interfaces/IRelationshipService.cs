@@ -12,6 +12,7 @@ namespace SocialMediaServer.Services.Interfaces
     {
 
         Task<List<FollowingResponseDTO>> GetUserFollowing(string user_id);
+        Task<List<PersonalMessengerResponseDTO>?> GetCurrentUserPersonalMessenger(string user_id);
         Task FollowUser(string sender_id, string receiver_id);
         Task UnFollowUser(string sender_id, string receiver_id);
 

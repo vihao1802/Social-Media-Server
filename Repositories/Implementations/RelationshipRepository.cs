@@ -50,6 +50,18 @@ namespace SocialMediaServer.Repositories.Implementations
             return list_following;
         }
 
+        public async Task<List<Relationship>> GetUser_Following_Follower(string user_id)
+        {
+            var list_following_follower = await _dbContext.Relationships
+            .Include(r => r.Receiver)
+            .Include(r => r.Sender)
+            .Where(r => (r.Sender.Id == user_id || r.Receiver.Id == user_id) &&
+            r.Relationship_type == RelationshipType.Follow)
+            .ToListAsync();
+
+            return list_following_follower;
+        }
+
         public async Task<List<Relationship>> GetUserFollower(string user_id)
         {
             var list_following = await _dbContext.Relationships

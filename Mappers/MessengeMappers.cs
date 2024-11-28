@@ -9,16 +9,19 @@ namespace SocialMediaServer.Mappers
 {
     public static class MessengeMappers
     {
-        public static MessengeResponseDTO ToMessengeResponseDTO(this Messenge r){
-            return new MessengeResponseDTO{
-                Content = r.Content,
-                MediaContents = r.MediaContents,
-                SenderId = r.SenderId,
-                Sender = r.Sender.UserToUserResponseDTO(),
-                ReceiverId = r.ReceiverId,
-                receiver = r.Receiver.UserToUserResponseDTO(),
-                Sent_at = r.Sent_at,
-                ReplyToId = r.ReplyToId,
+        public static MessengeResponseDTO? ToMessengeResponseDTO(this Messenge r){
+            if (r == null) return null;
+
+            return new MessengeResponseDTO
+            {
+                Content = r.Content ?? string.Empty,
+                MediaContents = r.MediaContents ?? new List<MessengeMediaContent>(),
+                SenderId = r.SenderId ?? string.Empty,
+                Sender = r.Sender?.UserToUserResponseDTO(),
+                ReceiverId = r.ReceiverId ?? string.Empty,
+                receiver = r.Receiver?.UserToUserResponseDTO(),
+                Sent_at = r.Sent_at ?? DateTime.MinValue,
+                ReplyToId = r.ReplyToId
             };
         }
     }
