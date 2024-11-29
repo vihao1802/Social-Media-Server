@@ -100,86 +100,57 @@ namespace SocialMediaServer.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO fotgotpasswordDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            try
             {
-                var send_verify_mail = await _AuthService.ForgotPassword(fotgotpasswordDto.Email);
-                if (send_verify_mail == null)
-                {
-                    return BadRequest("User not exist !");
-                }
-                else if (send_verify_mail.Succeeded)
-                {
-                    return Ok("Send verify mail success !");
-                }
-                else
-                {
-                    return BadRequest("Send verify mail failed !");
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
+                var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                throw new AppError($"Invalid params: {string.Join(", ", errors)}", 400);
             }
 
+            await _AuthService.ForgotPassword(fotgotpasswordDto.Email);
+            return Ok("Send verify mail success !");
         }
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            try
             {
-                var result = await _AuthService.ResetPassword(resetPasswordDto);
-                if (result == null)
-                {
-                    return BadRequest("User not exist !");
-                }
-                else if (result.Succeeded)
-                {
-                    return Ok("Reset password success !");
-                }
-                else
-                {
-                    return BadRequest($"Reset password failed !{result.Errors.FirstOrDefault()?.Description}");
-                }
+                var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                throw new AppError($"Invalid params: {string.Join(", ", errors)}", 400);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+
+            await _AuthService.ResetPassword(resetPasswordDto);
+
+            return Ok("Reset password success !");
+
         }
 
         [HttpPost("update-password")]
         public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDTO updatePasswordDto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            try
             {
-                var result = await _AuthService.UpdatePassword(updatePasswordDto);
+                var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
 
-                if (result == null)
-                {
-                    return BadRequest("User not exist !");
-                }
-                else if (result.Succeeded)
-                {
-                    return Ok(
-                        "Update password success !"
-                    );
-                }
-                else
-                {
-                    return BadRequest($"Update password failed ! {result.Errors.FirstOrDefault()?.Description}");
-                }
+                throw new AppError($"Invalid params: {string.Join(", ", errors)}", 400);
             }
-            catch (System.Exception)
-            {
 
-                throw;
-            }
+            await _AuthService.UpdatePassword(updatePasswordDto, User);
+
+            return Ok(
+                "Update password success !"
+            );
+
         }
 
     }

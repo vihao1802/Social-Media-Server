@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using DotNetEnv;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Routing;
 using SocialMediaServer.DTOs;
@@ -20,11 +22,14 @@ namespace SocialMediaServer.Services.Implementations
         private readonly IAuthRepository _AuthRepository;
         private readonly IUserRepository _UserRepository;
         private readonly IEmailSender _emailSender;
-        public AuthService(IAuthRepository AuthRepository, IUserRepository userRepository, IEmailSender emailSender)
+        private readonly IUserService _userService;
+
+        public AuthService(IAuthRepository AuthRepository, IUserRepository userRepository, IEmailSender emailSender, IUserService userService)
         {
             _AuthRepository = AuthRepository;
             _UserRepository = userRepository;
             _emailSender = emailSender;
+            _userService = userService;
         }
 
         public async Task<SignInResult?> Login(LoginDTO loginDto)
@@ -76,54 +81,55 @@ namespace SocialMediaServer.Services.Implementations
             return result;
         }
 
-        public async Task<IdentityResult?> ForgotPassword(string email)
+        public async Task ForgotPassword(string email)
         {
-            var user_request = await _AuthRepository.GetUserByEmail(email);
-            if (user_request == null)
-                return null;
+            var user_request = await _AuthRepository.GetUserByEmail(email) ?? throw new AppError("User not found", 400);
+
             var reset_token = await _AuthRepository.GetPasswordResetToken(user_request);
+
+            string clientDomain = Environment.GetEnvironmentVariable("CLIENT_DOMAIN") ?? throw new ArgumentException("Front end URL not found");
+            string url = $"{clientDomain}/api/auth/reset-password?token={reset_token}&email={email}";
+            string email_body = $"Click the link below to reset your password {url}";
+
             try
             {
-                string url = $"https://localhost:5001/auth/reset-password?email={email}&token={reset_token}";
-                string email_body = $"Click the link below to reset your password {reset_token}";
                 await _emailSender.SendEmailAsync(email, "Verify your email", email_body);
-                return IdentityResult.Success;
-
             }
             catch (Exception ex)
             {
-                return IdentityResult.Failed(new IdentityError { Description = ex.ToString() });
+                Console.WriteLine(ex);
+                throw new AppError("Send email failed ", 400);
             }
 
         }
 
-        public async Task<IdentityResult?> ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        public async Task ResetPassword(ResetPasswordDTO resetPasswordDTO)
         {
-            var user_request = await _AuthRepository.GetUserByEmail(resetPasswordDTO.Email);
-            if (user_request == null)
-                return null;
+            var user_request = await _AuthRepository.GetUserByEmail(resetPasswordDTO.Email) ?? throw new AppError("User not found", 400);
 
             var validate_password = await _AuthRepository.ValidatePassword(user_request, resetPasswordDTO.NewPassword);
             if (!validate_password.Succeeded)
-                return IdentityResult.Failed(new IdentityError { Description = "Password is invalid" });
+                throw new AppError("Password is invalid", 400);
 
             var result = await _AuthRepository.ResetPassword(user_request, resetPasswordDTO.ResetToken, resetPasswordDTO.NewPassword);
-            return result;
+
+            if (!result.Succeeded)
+                throw new AppError("Invalid token", 400);
+
         }
 
-        public async Task<IdentityResult?> UpdatePassword(UpdatePasswordDTO updatePasswordDTO)
+        public async Task UpdatePassword(UpdatePasswordDTO updatePasswordDTO, ClaimsPrincipal principal)
         {
-            var user_request = await _AuthRepository.GetUserByEmail(updatePasswordDTO.Email);
-            if (user_request == null)
-                return null;
+            var user_request = await _UserRepository.GetUserByClaimPrincipal(principal) ?? throw new AppError("User not found", 400);
 
             var validate_password = await _AuthRepository.ValidatePassword(user_request, updatePasswordDTO.NewPassword);
+
             if (!validate_password.Succeeded)
-                return IdentityResult.Failed(new IdentityError { Description = "Password is invalid" });
+                throw new AppError("Invalid password: " + validate_password.Errors.FirstOrDefault()?.Description, 400);
 
             var result = await _AuthRepository.UpdatePassword(user_request, updatePasswordDTO.CurrentPassword, updatePasswordDTO.NewPassword);
-            return result;
-        }
 
+            if (!result.Succeeded) throw new AppError("Update password failed: " + result.Errors.FirstOrDefault()?.Description, 400);
+        }
     }
 }
