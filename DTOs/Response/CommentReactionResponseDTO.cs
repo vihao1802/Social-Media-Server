@@ -6,8 +6,8 @@ namespace DTOs.Response
     public class CommentReactionResponseDTO
     {
         public int Id { get; set; }
-        public UserResponseDTO User { get; set; }
-        public CommentResponseDTO Comment { get; set; }
+        public string userId { get; set; }
+        public int commentId { get; set; }
         public DateTime Reaction_at { get; set; }
 
     }

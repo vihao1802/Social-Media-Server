@@ -22,8 +22,8 @@ namespace SocialMediaServer.Mappers
             return new PostViewerResponseDTO
             {
                 Id = postViewer.Id,
-                Post = post,
-                User = user,
+                postId = post.Id,
+                userId = user.Id,
                 Liked = postViewer.Liked
             };
         }
