@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SocialMediaServer.DTOs;
@@ -14,9 +15,9 @@ namespace SocialMediaServer.Services.Interfaces
         Task Register(RegisterDTO registerDTO);
         Task<SignInResult?> Login(LoginDTO loginDto);
         Task<IdentityResult> Logout();
-        Task<IdentityResult?> ForgotPassword(string email);
-        Task<IdentityResult?> ResetPassword(ResetPasswordDTO resetPasswordDTO);
-        Task<IdentityResult?> UpdatePassword(UpdatePasswordDTO updatePasswordDTO);
+        Task ForgotPassword(string email);
+        Task ResetPassword(ResetPasswordDTO resetPasswordDTO);
+        Task UpdatePassword(UpdatePasswordDTO updatePasswordDTO, ClaimsPrincipal principal);
 
     }
 }

@@ -109,6 +109,7 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 builder.Services.AddScoped<IMessengeRepository, MessengeRepository>();
 builder.Services.AddScoped<IMessengeService, MessengeService>();
 builder.Services.AddScoped<IMessengeMediaContent, MessengeMediaContentRepository>();
+builder.Services.AddScoped<IWebSocketService, WebSocketService>();
 
 
 
@@ -153,6 +154,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
@@ -163,8 +166,27 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// Để đó sẽ cần dùng đến messenge
-app.UseWebSockets();
+// Enable WebSocket middleware
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+app.UseWebSockets(webSocketOptions);
+
+// Map WebSocket requests
+app.Map("/ws/messenge", async context =>
+{
+    if (context.WebSockets.IsWebSocketRequest)
+    {
+        var webSocketService = context.RequestServices.GetRequiredService<IWebSocketService>();
+        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+        await webSocketService.HandleWebSocketConnectionAsync(webSocket);
+    }
+    else
+    {
+        context.Response.StatusCode = 400; // Bad Request
+    }
+});
 
 app.MapControllers();
 

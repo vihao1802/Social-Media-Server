@@ -21,8 +21,10 @@ namespace SocialMediaServer.Repositories.Implementations
 
         public async Task<List<Messenge>> GetMessagesByRelationshipIdAsync(int relationshipId){
             var messenges = await _context.Messenges
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
             .Where(m => m.RelationshipId == relationshipId)
-            .OrderByDescending(m => m.Sent_at)
+            .OrderBy(m => m.Sent_at)
             .ToListAsync();
 
             return messenges;

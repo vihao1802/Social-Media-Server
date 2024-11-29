@@ -14,7 +14,9 @@ namespace SocialMediaServer.Mappers
                 Content = r.Content,
                 MediaContents = r.MediaContents,
                 SenderId = r.SenderId,
+                Sender = r.Sender.UserToUserResponseDTO(),
                 ReceiverId = r.ReceiverId,
+                receiver = r.Receiver.UserToUserResponseDTO(),
                 Sent_at = r.Sent_at,
                 ReplyToId = r.ReplyToId,
             };

@@ -7,7 +7,15 @@ namespace SocialMediaServer.DTOs.Request.MediaContent
     {
         [Required]
         public string Media_type { get; set; } = null!;
+
         [Required]
         public int PostId { get; set; }
+
+        public override string ToString()
+        {
+            return $"Media_type: {Media_type}, PostId: {PostId}";
+        }
     }
+
+
 }
