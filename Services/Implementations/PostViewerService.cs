@@ -14,22 +14,22 @@ namespace SocialMediaServer.Services.Implementations
 {
     public class PostViewerService : IPostViewerService
     {
-       private readonly IPostViewerRepository _postViewerRepository;
-       private readonly IUserRepository _userRepository;
-       private readonly IPostRepository _postRepository;
-       private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPostViewerRepository _postViewerRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-       public PostViewerService(IPostViewerRepository postViewerRepository, IUserRepository userRepository, 
-           IPostRepository postRepository, IHttpContextAccessor httpContextAccessor)
-       {
-           _postViewerRepository = postViewerRepository;
-           _userRepository = userRepository;
-           _postRepository = postRepository;
-           _httpContextAccessor = httpContextAccessor;
-       }
+        public PostViewerService(IPostViewerRepository postViewerRepository, IUserRepository userRepository,
+            IPostRepository postRepository, IHttpContextAccessor httpContextAccessor)
+        {
+            _postViewerRepository = postViewerRepository;
+            _userRepository = userRepository;
+            _postRepository = postRepository;
+            _httpContextAccessor = httpContextAccessor;
+        }
 
-       public async Task<PaginatedResult<PostViewerResponseDTO>> GetAllByPostIdAsync(int postId, PostViewerQueryDTO postViewerQueryDTO)
-       {
+        public async Task<PaginatedResult<PostViewerResponseDTO>> GetAllByPostIdAsync(int postId, PostViewerQueryDTO postViewerQueryDTO)
+        {
             var postViewers = await _postViewerRepository.GetAllByPostIdAsync(postId, postViewerQueryDTO);
             var listPostViewersDto = postViewers.Items.Select(post => post.PostViewerToPostViewerResponseDTO()).ToList();
 
