@@ -21,6 +21,7 @@ namespace SocialMediaServer.Services.Interfaces
         Task BlockUser(string sender_id, string receiver_id);
         Task UnBlockUser(string sender_id, string receiver_id);
 
-
+        Task<int> GetFollowingQuantity(string user_id);
+        Task<int> GetFollowerQuantity(string user_id);
     }
 }

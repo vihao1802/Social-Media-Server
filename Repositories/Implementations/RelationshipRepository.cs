@@ -104,5 +104,21 @@ namespace SocialMediaServer.Repositories.Implementations
 
             return r;
         }
+
+        public async Task<int> GetFollowingQuantity(string user_id){
+            var quantity = await _dbContext.Relationships
+            .Where(r => r.Sender.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
+            .CountAsync();
+
+            return quantity;
+        }
+
+        public async Task<int> GetFollowerQuantity(string user_id){
+            var quantity = await _dbContext.Relationships
+            .Where(r => r.Receiver.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
+            .CountAsync();
+
+            return quantity;
+        }
     }
 }

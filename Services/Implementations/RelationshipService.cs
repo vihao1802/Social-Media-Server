@@ -183,6 +183,22 @@ namespace SocialMediaServer.Services.Implementations
             return list_personal_messenger;
         }
 
+        public async Task<int> GetFollowingQuantity(string user_id)
+        {
+            var check_user = await _userService.GetUserById(user_id) ?? throw new AppError("User not found", 404);
 
+            var quantity = await _relationshipRepository.GetFollowingQuantity(user_id);
+
+            return quantity;
+        }
+
+        public async Task<int> GetFollowerQuantity(string user_id)
+        {
+            var check_user = await _userService.GetUserById(user_id) ?? throw new AppError("User not found", 404);
+
+            var quantity = await _relationshipRepository.GetFollowerQuantity(user_id);
+
+            return quantity;
+        }
     }
 }

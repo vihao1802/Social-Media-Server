@@ -145,5 +145,20 @@ namespace SocialMediaServer.Controllers
             return Ok(list_following);
 
         }
+
+        [HttpGet("{user_id}/following/get-quantity")]
+        public async Task<IActionResult> GetFollowingQuantity([FromRoute] string user_id)
+        {
+            var quantity = await _relationshipService.GetFollowingQuantity(user_id);
+            return Ok(new { quantity });
+        }   
+
+        [HttpGet("{user_id}/follower/get-quantity")]
+        public async Task<IActionResult> GetFollowerQuantity([FromRoute] string user_id)
+        {
+            var quantity = await _relationshipService.GetFollowerQuantity(user_id);
+
+            return Ok(new { quantity });
+        }
     }
 }

@@ -20,5 +20,7 @@ namespace SocialMediaServer.Repositories.Interfaces
 
         // Sử dụng cho messenge
         Task<Relationship> GetRelationshipById(int relationShipId);
+        Task<int> GetFollowingQuantity(string user_id);
+        Task<int> GetFollowerQuantity(string user_id);
     }
 }
