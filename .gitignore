@@ -120,4 +120,4 @@ src/.vs/config/applicationhost.config
 
 .env
 
-**/Migrations/
+Migrations/
