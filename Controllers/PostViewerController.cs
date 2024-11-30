@@ -23,7 +23,7 @@ namespace SocialMediaServer.Controllers
             var posts = await _postViewerService.GetAllByPostIdAsync(post_id, postViewerQueryDTO);
             return Ok(posts);
         }
-         
+
         [HttpPost]
         public async Task<IActionResult> CreateByPostId(
             [FromBody] PostViewerCreateDTO postViewerCreateDTO)

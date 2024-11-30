@@ -6,8 +6,8 @@ namespace DTOs.Response
     public class PostViewerResponseDTO
     {
         public int Id { get; set; }
-        public PostResponseDTO Post { get; set; }
-        public UserResponseDTO User { get; set; }
+        public string userId { get; set; }
+        public int postId { get; set; }
         public bool Liked { get; set; }
     }
 }
