@@ -1,19 +1,22 @@
 
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+
 namespace SocialMediaServer.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        public int Id { get; set; }
-        public string? Username { get; set; }
         public string? Profile_img { get; set; }
-        public string Bio { get; set; } = string.Empty;
+
+        [StringLength(100)]
+        public string? Bio { get; set; }
 
         public DateTime? Date_of_birth { get; set; }
 
-        public DateTime Create_at { get; set; } = DateTime.Now;
+        public string? PhoneNumber { get; set; }
         public bool Gender { get; set; } = true;
-
-        public List<Login> Logins { get; set; } = new List<Login>();
+        public DateTime Create_at { get; set; } = DateTime.Now;
+        public bool Is_disabled { get; set; } = false;
         public List<Relationship> SentRelationships { get; set; } = new List<Relationship>();
         public List<Relationship> ReceivedRelationships { get; set; } = new List<Relationship>();
         public List<Post> Posts { get; set; } = new List<Post>();
@@ -27,5 +30,6 @@ namespace SocialMediaServer.Models
 
         public List<Messenge> MessengeSent { get; set; } = new List<Messenge>();
         public List<Messenge> MessengeReceived { get; set; } = new List<Messenge>();
+        public List<MessageReaction> Reactions { get; set; } = new List<MessageReaction>();
     }
 }

@@ -17,10 +17,157 @@ namespace SocialMediaServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "7da28442-621f-4ad7-a951-f52a97735ff3",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "ecf828bd-6d06-4181-923f-1b3e4d519584",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
 
             modelBuilder.Entity("SocialMediaServer.Models.Comment", b =>
                 {
@@ -47,8 +194,9 @@ namespace SocialMediaServer.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -58,7 +206,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.CommentReaction", b =>
@@ -75,8 +223,9 @@ namespace SocialMediaServer.Migrations
                     b.Property<DateTime>("Reaction_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -84,7 +233,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommentReaction");
+                    b.ToTable("CommentReactions");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.GroupChat", b =>
@@ -94,6 +243,10 @@ namespace SocialMediaServer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Created_at")
                         .HasColumnType("datetime2");
@@ -106,9 +259,12 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
-                    b.ToTable("GroupChat");
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.GroupMember", b =>
@@ -122,14 +278,24 @@ namespace SocialMediaServer.Migrations
                     b.Property<int>("GroupChatId")
                         .HasColumnType("int");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Join_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("Left_at")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isLeft")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("isTurnOff")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -137,7 +303,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GroupMember");
+                    b.ToTable("GroupMembers");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.GroupMessenge", b =>
@@ -159,14 +325,18 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReplyToId")
+                    b.Property<int?>("ReplyToId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Sent_at")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("isDelete")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -176,39 +346,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("GroupMessenge");
-                });
-
-            modelBuilder.Entity("SocialMediaServer.Models.Login", b =>
-                {
-                    b.Property<int>("LoginId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LoginId"));
-
-                    b.Property<DateTime>("Create_at")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Hash_password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte>("Is_disabled")
-                        .HasColumnType("TINYINT");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("LoginId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Logins");
+                    b.ToTable("GroupMessenges");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.MediaContent", b =>
@@ -234,7 +372,38 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("MediaContent");
+                    b.ToTable("MediaContents");
+                });
+
+            modelBuilder.Entity("SocialMediaServer.Models.MessageReaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupMessageId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReactedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupMessageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MessageReactions");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.Messenge", b =>
@@ -249,14 +418,19 @@ namespace SocialMediaServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ReceiverId")
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RelationshipId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReplyToId")
+                    b.Property<int?>("ReplyToId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("Sent_at")
                         .HasColumnType("datetime2");
@@ -265,11 +439,13 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("ReceiverId");
 
+                    b.HasIndex("RelationshipId");
+
                     b.HasIndex("ReplyToId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messenge");
+                    b.ToTable("Messenges");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.MessengeMediaContent", b =>
@@ -295,7 +471,32 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("MessengeId");
 
-                    b.ToTable("MessengeMediaContent");
+                    b.ToTable("MessengeMediaContents");
+                });
+
+            modelBuilder.Entity("SocialMediaServer.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.Post", b =>
@@ -313,8 +514,9 @@ namespace SocialMediaServer.Migrations
                     b.Property<DateTime>("Create_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatorId")
-                        .HasColumnType("int");
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<byte>("Is_story")
                         .HasColumnType("TINYINT");
@@ -326,7 +528,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.PostViewer", b =>
@@ -343,8 +545,9 @@ namespace SocialMediaServer.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -352,7 +555,7 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PostViewer");
+                    b.ToTable("PostViewers");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.Relationship", b =>
@@ -366,19 +569,19 @@ namespace SocialMediaServer.Migrations
                     b.Property<DateTime>("Create_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ReceiverId")
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Relationship_type")
                         .HasColumnType("int");
 
-                    b.Property<string>("Relationship_type")
+                    b.Property<string>("SenderId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("SenderId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -391,14 +594,18 @@ namespace SocialMediaServer.Migrations
 
             modelBuilder.Entity("SocialMediaServer.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Bio")
-                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Create_at")
@@ -407,18 +614,117 @@ namespace SocialMediaServer.Migrations
                     b.Property<DateTime?>("Date_of_birth")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<byte>("Gender")
                         .HasColumnType("TINYINT");
+
+                    b.Property<bool>("Is_disabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Profile_img")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("SocialMediaServer.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("SocialMediaServer.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialMediaServer.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("SocialMediaServer.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.Comment", b =>
@@ -487,7 +793,7 @@ namespace SocialMediaServer.Migrations
             modelBuilder.Entity("SocialMediaServer.Models.GroupMessenge", b =>
                 {
                     b.HasOne("SocialMediaServer.Models.GroupChat", "groupChat")
-                        .WithMany()
+                        .WithMany("Messages")
                         .HasForeignKey("GroupChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -495,8 +801,7 @@ namespace SocialMediaServer.Migrations
                     b.HasOne("SocialMediaServer.Models.GroupMessenge", "ReplyTo")
                         .WithMany("Replies")
                         .HasForeignKey("ReplyToId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialMediaServer.Models.User", "Sender")
                         .WithMany("GroupMessenges")
@@ -511,17 +816,6 @@ namespace SocialMediaServer.Migrations
                     b.Navigation("groupChat");
                 });
 
-            modelBuilder.Entity("SocialMediaServer.Models.Login", b =>
-                {
-                    b.HasOne("SocialMediaServer.Models.User", "User")
-                        .WithMany("Logins")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("SocialMediaServer.Models.MediaContent", b =>
                 {
                     b.HasOne("SocialMediaServer.Models.Post", "Post")
@@ -533,6 +827,25 @@ namespace SocialMediaServer.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("SocialMediaServer.Models.MessageReaction", b =>
+                {
+                    b.HasOne("SocialMediaServer.Models.GroupMessenge", "GroupMessage")
+                        .WithMany("Reactions")
+                        .HasForeignKey("GroupMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialMediaServer.Models.User", "User")
+                        .WithMany("Reactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupMessage");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialMediaServer.Models.Messenge", b =>
                 {
                     b.HasOne("SocialMediaServer.Models.User", "Receiver")
@@ -541,11 +854,16 @@ namespace SocialMediaServer.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SocialMediaServer.Models.Relationship", "Relationship")
+                        .WithMany()
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SocialMediaServer.Models.Messenge", "ReplyTo")
                         .WithMany("Replies")
                         .HasForeignKey("ReplyToId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("SocialMediaServer.Models.User", "Sender")
                         .WithMany("MessengeSent")
@@ -554,6 +872,8 @@ namespace SocialMediaServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Receiver");
+
+                    b.Navigation("Relationship");
 
                     b.Navigation("ReplyTo");
 
@@ -569,6 +889,17 @@ namespace SocialMediaServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Messenge");
+                });
+
+            modelBuilder.Entity("SocialMediaServer.Models.Notification", b =>
+                {
+                    b.HasOne("SocialMediaServer.Models.GroupChat", "Group")
+                        .WithMany("Notifications")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.Post", b =>
@@ -630,10 +961,16 @@ namespace SocialMediaServer.Migrations
             modelBuilder.Entity("SocialMediaServer.Models.GroupChat", b =>
                 {
                     b.Navigation("Members");
+
+                    b.Navigation("Messages");
+
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("SocialMediaServer.Models.GroupMessenge", b =>
                 {
+                    b.Navigation("Reactions");
+
                     b.Navigation("Replies");
                 });
 
@@ -663,8 +1000,6 @@ namespace SocialMediaServer.Migrations
 
                     b.Navigation("GroupMessenges");
 
-                    b.Navigation("Logins");
-
                     b.Navigation("MessengeReceived");
 
                     b.Navigation("MessengeSent");
@@ -672,6 +1007,8 @@ namespace SocialMediaServer.Migrations
                     b.Navigation("PostViewers");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("Reactions");
 
                     b.Navigation("ReceivedRelationships");
 

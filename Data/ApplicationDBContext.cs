@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
+
 using SocialMediaServer.Models;
 
 namespace SocialMediaServer.Data;
-public class ApplicationDBContext : DbContext
+public class ApplicationDBContext : IdentityDbContext<User>
 {
     public ApplicationDBContext(DbContextOptions options) : base(options)
     {
@@ -11,20 +13,30 @@ public class ApplicationDBContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Login> Logins { get; set; }
     public DbSet<Relationship> Relationships { get; set; }
+    public DbSet<Post> Posts { get; set; }
+    public DbSet<PostViewer> PostViewers { get; set; }
+    public DbSet<MediaContent> MediaContents { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<CommentReaction> CommentReactions { get; set; }
+    public DbSet<GroupChat> Groups { get; set; }
+    public DbSet<GroupMember> GroupMembers { get; set; }
+    public DbSet<GroupMessenge> GroupMessenges { get; set; }
+    public DbSet<Messenge> Messenges { get; set; }
+    public DbSet<MessengeMediaContent> MessengeMediaContents { get; set; }
+    public DbSet<MessageReaction> MessageReactions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<User>()
         .Property(e => e.Gender)
         .HasConversion<Byte>()
         .HasColumnType("TINYINT");
 
-        modelBuilder.Entity<Login>()
-        .Property(e => e.Is_disabled)
-        .HasConversion<Byte>()
-        .HasColumnType("TINYINT");
         modelBuilder.Entity<PostViewer>()
         .Property(e => e.Liked)
         .HasConversion<Byte>()
@@ -129,5 +141,38 @@ public class ApplicationDBContext : DbContext
             .WithMany(u => u.MediaContents) // A User can receive many Messages
             .HasForeignKey(m => m.MessengeId) // The foreign key is UserId
             .OnDelete(DeleteBehavior.Cascade); // Allow cascading deletes
+
+        // Cấu hình quan hệ cho MessageReaction
+        modelBuilder.Entity<MessageReaction>()
+            .HasOne(mr => mr.GroupMessage)
+            .WithMany(gm => gm.Reactions) // GroupMessenge có nhiều Reactions
+            .HasForeignKey(mr => mr.GroupMessageId)
+            .OnDelete(DeleteBehavior.Cascade); // Xóa tin nhắn thì xóa luôn reactions của tin nhắn đó
+
+        modelBuilder.Entity<MessageReaction>()
+            .HasOne(mr => mr.User)
+            .WithMany(u => u.Reactions) // User có nhiều Reactions
+            .HasForeignKey(mr => mr.UserId)
+            .OnDelete(DeleteBehavior.Cascade); // Xóa người dùng thì xóa luôn reactions của họ
+        modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Group) // Một thông báo liên kết với một nhóm
+                .WithMany(g => g.Notifications) // Một nhóm có nhiều thông báo
+                .HasForeignKey(n => n.GroupId) // Khóa ngoại
+                .OnDelete(DeleteBehavior.Cascade); // Khi xóa nhóm thì xóa thông báo
+
+        List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name = "User",
+                    NormalizedName = "USER"
+                },
+            };
+        modelBuilder.Entity<IdentityRole>().HasData(roles);
     }
 }

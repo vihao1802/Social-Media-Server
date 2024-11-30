@@ -1,4 +1,5 @@
 namespace SocialMediaServer.Models;
+
 public class MessengeMediaContent
 {
     public int Id { get; set; }

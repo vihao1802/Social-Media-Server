@@ -5,7 +5,7 @@ public class Comment
     public string Content { get; set; } = string.Empty;
     public string Content_gif { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public User User { get; set; }
     public int PostId { get; set; }
     public Post Post { get; set; }
