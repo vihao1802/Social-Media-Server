@@ -7,7 +7,7 @@ namespace SocialMediaServer.Services.Interfaces
 {
     public interface IGroupMessengeService
     {
-        Task<PaginatedResult<GrMessResponseDTO>> GetAllByGroupIdAsync(int groupId, GrMessQueryDTO grMessQueryDTO);
+        Task<PaginatedResult<GrMessResponseDTO>> GetAllByGroupIdAsync(int groupId, GrMessQueryDTO grMessQueryDTO, string userId);
         Task<GrMessResponseDTO> CreateAsync(GrMessCreateDTO grMessCreateDTO);
         Task<bool> DeleteAsync(int id);
         Task<bool> RecallAsync(int id);

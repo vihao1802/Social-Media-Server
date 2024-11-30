@@ -15,10 +15,12 @@ namespace SocialMediaServer.Controllers
     public class GroupMessengeController : ControllerBase
     {
         private readonly IGroupMessengeService _groupMessengeService;
+        private readonly IUserService _userService;
 
-        public GroupMessengeController(IGroupMessengeService groupMessengeService)
+        public GroupMessengeController(IGroupMessengeService groupMessengeService, IUserService userService)
         {
             _groupMessengeService = groupMessengeService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -94,9 +96,10 @@ namespace SocialMediaServer.Controllers
         [Route("GetAllByGroupId/{groupId}")]
         public async Task<IActionResult> GetAllByGroupIdAsync(int groupId, [FromQuery] GrMessQueryDTO grMessQueryDTO)
         {
+            var userClaims = await _userService.GetCurrentUser(User);
             try
             {
-                var result = await _groupMessengeService.GetAllByGroupIdAsync(groupId, grMessQueryDTO);
+                var result = await _groupMessengeService.GetAllByGroupIdAsync(groupId, grMessQueryDTO, userClaims.Id.ToString());
                 return Ok(result);
             }
             catch (AppError ex)
@@ -109,9 +112,11 @@ namespace SocialMediaServer.Controllers
         [Route("GetById/{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
+            var userClaims = await _userService.GetCurrentUser(User);
+
             try
             {
-                var grMess = await _groupMessengeService.GetAllByGroupIdAsync(id, new GrMessQueryDTO());
+                var grMess = await _groupMessengeService.GetAllByGroupIdAsync(id, new GrMessQueryDTO(),userClaims.Id.ToString());
                 if (grMess == null)
                     return NotFound("Message not found");
                 return Ok(grMess);

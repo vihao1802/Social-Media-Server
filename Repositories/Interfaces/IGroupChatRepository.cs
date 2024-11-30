@@ -12,7 +12,7 @@ namespace SocialMediaServer.Repositories.Interfaces
        Task<GroupChat> UpdateAsync(GroupChat groupChat);
        Task<bool> DeleteAsync(int id);
        Task<PaginatedResult<GroupChat>> GetAllAsync(GroupChatQueryDTO postQueryDTO);
-       Task<PaginatedResult<GroupChat>> GetAllByUserAsync(GroupChatQueryDTO postQueryDTO, string userId);
+       Task<PaginatedResult<GroupChat>> GetAllByUserAsync( string userId);
        Task<List<GroupChat>> SearchByNameAsync(string searchString);
     }
 }

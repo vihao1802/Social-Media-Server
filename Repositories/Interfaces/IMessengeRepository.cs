@@ -13,5 +13,6 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<Messenge> SendMessengeAsync(Messenge message);
         Task DeleteMessengeAsync(Messenge message);
         Task<Messenge> GetMessengeAsyncById(int messengeId);
+        Task<Messenge> GetLatestMessageByRelationshipIdAsync(int relationshipId);
     }
 }

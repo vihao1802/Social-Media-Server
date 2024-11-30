@@ -47,6 +47,7 @@ namespace SocialMediaServer.Repositories.Implementations
                           .Include(c => c.Replies)
                           .Include(c => c.ReplyTo)
                           .Include(c => c.Reactions)
+                          .Include(c => c.Sender)
                           .Where(x => x.GroupChatId == idGroup);
             Console.WriteLine(grMessenges.Count());
             var grMessQuery = grMessenges

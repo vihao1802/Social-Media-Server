@@ -40,6 +40,11 @@ namespace SocialMediaServer.Services.Implementations
             return list_messenges_dto;
         }
 
+        public async Task<MessengeResponseDTO?> GetLatestMessageByRelationshipIdAsync(int relationshipId){
+            var message = await _messengeRepo.GetLatestMessageByRelationshipIdAsync(relationshipId);
+            return message.ToMessengeResponseDTO();
+        }
+
         public async Task SendMessengeAsync(string senderId, int relationshipId, int? replytoId , string? content, List<string>? filesName){
 
             var relationShip = await _relationshipRepository.GetRelationshipById(relationshipId);
