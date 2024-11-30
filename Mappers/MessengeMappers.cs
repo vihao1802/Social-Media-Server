@@ -15,7 +15,12 @@ namespace SocialMediaServer.Mappers
             return new MessengeResponseDTO
             {
                 Content = r.Content ?? string.Empty,
-                MediaContents = r.MediaContents ?? new List<MessengeMediaContent>(),
+                MediaContents = r.MediaContents?.Select(m => new MessengeMediaContent
+                {
+                    Media_url = m.Media_url,
+                    Media_type = m.Media_type,
+                    MessengeId = m.MessengeId
+                }).ToList() ?? new List<MessengeMediaContent>(),
                 SenderId = r.SenderId ?? string.Empty,
                 Sender = r.Sender?.UserToUserResponseDTO(),
                 ReceiverId = r.ReceiverId ?? string.Empty,

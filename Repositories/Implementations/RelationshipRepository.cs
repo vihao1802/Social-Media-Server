@@ -56,7 +56,7 @@ namespace SocialMediaServer.Repositories.Implementations
             .Include(r => r.Receiver)
             .Include(r => r.Sender)
             .Where(r => (r.Sender.Id == user_id || r.Receiver.Id == user_id) &&
-            r.Relationship_type == RelationshipType.Follow)
+            r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
             .ToListAsync();
 
             return list_following_follower;

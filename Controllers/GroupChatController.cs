@@ -13,10 +13,12 @@ namespace SocialMediaServer.Controllers
     public class GroupChatController : ControllerBase
     {
         private readonly IGroupChatService _groupChatService;
+        private readonly IUserService _userService ;
 
-        public GroupChatController(IGroupChatService groupChatService)
+        public GroupChatController(IGroupChatService groupChatService,IUserService userService)
         {
             _groupChatService = groupChatService;
+            _userService = userService;
         }
 
         [HttpGet("GetAll")]
@@ -26,10 +28,11 @@ namespace SocialMediaServer.Controllers
             return Ok(groupChats);
         }
 
-        [HttpGet("GetAllByUser/{userId}")]
-        public async Task<IActionResult> GetAllByUsers([FromQuery] GroupChatQueryDTO groupChatQueryDTO, string userId)
+        [HttpGet("me/get-all")]
+        public async Task<IActionResult> GetAllByUsers([FromQuery] GroupChatQueryDTO groupChatQueryDTO)
         {
-            var groupChats = await _groupChatService.GetAllByUserAsync(groupChatQueryDTO,userId);
+            var userClaims = await _userService.GetCurrentUser(User);
+            var groupChats = await _groupChatService.GetAllByUserAsync(groupChatQueryDTO,userClaims.Id.ToString());
             return Ok(groupChats);
         }
 

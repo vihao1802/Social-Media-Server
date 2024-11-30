@@ -124,13 +124,13 @@ namespace SocialMediaServer.Services.Implementations
             return user;
         }
 
-        public async Task<PaginatedResult<GrMessResponseDTO>> GetAllByGroupIdAsync(int groupId, GrMessQueryDTO grMessQueryDTO)
+        public async Task<PaginatedResult<GrMessResponseDTO>> GetAllByGroupIdAsync(int groupId, GrMessQueryDTO grMessQueryDTO, string userId)
         {
-            var user = await GetCurrentUserAsync();
+            /* var user = await GetCurrentUserAsync();
             if (user == null)
             {
                 throw new AppError("You are not authorized", 401);
-            }
+            } */
 
             // Kiểm tra xem nhóm có tồn tại hay không
             var group = await _groupChatRepository.GetByIdAsync(groupId);
@@ -140,7 +140,7 @@ namespace SocialMediaServer.Services.Implementations
             }
 
             // Kiểm tra xem người dùng hiện tại có phải là thành viên của nhóm không
-            var isMember = await _grMemberRepository.IsMemberOfGroupAsync(group.Id, user.Id);
+            var isMember = await _grMemberRepository.IsMemberOfGroupAsync(group.Id, userId);
             if (!isMember)
             {
                 throw new AppError("Member not found", 404);

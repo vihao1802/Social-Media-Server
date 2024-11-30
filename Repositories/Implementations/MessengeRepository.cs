@@ -23,6 +23,7 @@ namespace SocialMediaServer.Repositories.Implementations
             var messenges = await _context.Messenges
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
+            .Include(m => m.MediaContents) 
             .Where(m => m.RelationshipId == relationshipId)
             .OrderBy(m => m.Sent_at)
             .ToListAsync();

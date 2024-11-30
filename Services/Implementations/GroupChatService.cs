@@ -172,7 +172,7 @@ namespace SocialMediaServer.Services.Implementations
             var user = await _userRepository.GetUserById(userId);
             if(user == null)
                 throw new AppError("User not found", 404);
-            var grChat = await _grChatRepository.GetAllAsync(grChatQueryDTO);
+            var grChat = await _grChatRepository.GetAllByUserAsync(userId);
 
             var listgrChatDto = grChat.Items.Select(grchat => grchat.GrChatToGrChatResponseDTO()).ToList();
 
