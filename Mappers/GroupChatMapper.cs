@@ -15,7 +15,11 @@ namespace SocialMediaServer.Mappers
             {
                 Id = grChat.Id,
                 name = grChat.Group_name,
-                avatar = grChat.Group_avt
+                avatar = grChat.Group_avt,
+                sent_at = grChat.Messages.FirstOrDefault()?.Sent_at ?? DateTime.MinValue,
+                adminId = grChat.AdminId,
+                latest_message_content = grChat.Messages.FirstOrDefault()?.Content ?? string.Empty,
+                latest_message_sender = grChat.Messages.FirstOrDefault()?.Sender?.UserToUserResponseDTO()
             };
         }
 
@@ -29,6 +33,17 @@ namespace SocialMediaServer.Mappers
                 Group_name = grChatCreateDTO.name,
                 Group_avt = grChatCreateDTO.avatar
             };
+        }
+
+        public static GroupChat GroupChatUpdateDTOToGroupChat(this UpdateGrChatDTO GroupChatUpdateDTO, GroupChat GroupChat)
+        {
+            if (GroupChatUpdateDTO == null)
+                throw new ArgumentNullException(nameof(GroupChatUpdateDTO), "GroupChatUpdateDTO cannot be null");
+
+            GroupChat.Group_name = GroupChatUpdateDTO.Group_name;
+            GroupChat.Group_avt = GroupChatUpdateDTO.Group_avt;
+
+            return GroupChat;
         }
     }
 }

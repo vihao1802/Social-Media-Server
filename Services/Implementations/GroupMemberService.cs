@@ -31,6 +31,18 @@ namespace SocialMediaServer.Services.Implementations
             if (user == null)
                 throw new AppError("User not found", 404);
 
+            var member = await _grMemberRepository.GetByGroupAndUser(group.Id, user.Id);
+            if(member != null){
+                if(!member.isLeft){
+                    throw new AppError("Member already exists");
+                } else {
+                    member.isLeft = false;
+                    member.Left_at = DateTime.Now;
+                    var memberUpdate = await _grMemberRepository.UpdateAsync(member);
+                    return memberUpdate.GrMemberToGrMemberResponseDTO();
+                }
+            }
+
             var grMember = grMemberCreateDTO.GrMemberCreateDTOToGrMember();
            
             grMember.GroupChat = group;
@@ -52,9 +64,25 @@ namespace SocialMediaServer.Services.Implementations
             return await _grMemberRepository.DeleteAsync(id);
         }
 
+        public async Task<bool> OutGroupAsync(int id)
+        {
+            var grMember = await _grMemberRepository.GetByIdAsync(id);
+
+            if (grMember == null)
+                throw new AppError("grMember not found", 404);
+
+            grMember.isLeft = true;
+            grMember.Left_at = DateTime.Now;
+            await _grMemberRepository.UpdateAsync(grMember);
+
+            return true;
+        }
+
         public async Task<PaginatedResult<GroupMemberResponseDTO>> GetAllAsync(GroupMemberQueryDTO grMemberQueryDTO)
         {
             var grMembers = await _grMemberRepository.GetAllAsync(grMemberQueryDTO);
+            var count = grMembers.Items.Count();
+            Console.WriteLine("size: " + count);
             var listgrMembersDto = grMembers.Items.Select(grMember =>
             grMember.GrMemberToGrMemberResponseDTO()).ToList();
 

@@ -59,7 +59,7 @@ namespace SocialMediaServer.Controllers
             var createdGrMember = await _grMemberService.CreateAsync(grMemberCreateDTO);
 
             return CreatedAtAction(nameof(GetById), 
-                new { grMember_id = createdGrMember.Id }, createdGrMember);
+                new { id = createdGrMember.Id }, createdGrMember);
         }
 
         [HttpPut("Update/{id}")]
@@ -84,6 +84,20 @@ namespace SocialMediaServer.Controllers
             try
             {
                 await _grMemberService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (AppError ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("OutGroup/{memberId}")]
+        public async Task<IActionResult> OutGroupAsync(int memberId)
+        {
+            try
+            {
+                await _grMemberService.OutGroupAsync(memberId);
                 return NoContent();
             }
             catch (AppError ex)

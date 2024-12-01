@@ -46,7 +46,7 @@ namespace SocialMediaServer.Mappers
 
             grMember.UserId = grMembertUpdateDTO.UserId;
             grMember.GroupChatId = grMembertUpdateDTO.GroupId;
-
+            grMember.isTurnOff = grMembertUpdateDTO.isTurnOff;
             return grMember;
         }
     }

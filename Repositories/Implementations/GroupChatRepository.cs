@@ -54,7 +54,8 @@ namespace SocialMediaServer.Repositories.Implementations
                 {"Created_at", grChatQueryDTO.Created_at}
             };
 
-            var grChats = _dbContext.Groups;
+            var grChats = _dbContext.Groups
+                            .Where(g => g.isDelete == false);
             var grChatsQuery = grChats
                 .ApplyIncludes(grChatQueryDTO.Includes)
                 .ApplyFilters(filterParams)
@@ -84,6 +85,18 @@ namespace SocialMediaServer.Repositories.Implementations
             return await _dbContext.Groups
                 .Where(gr => gr.Group_name.Contains(searchString))
                 .ToListAsync();
+        }
+
+        public async Task<PaginatedResult<GroupChat>> GetAllByUserAsync(string userId)
+        {
+            
+            var groupChats = _dbContext.Groups
+                .Include(g => g.Members)
+                .Where(g => g.isDelete == false && g.Members.Any(m => m.UserId == userId)) // Only include non-deleted groups where the user is a  member
+                .Include(g => g.Messages.OrderByDescending(m => m.Sent_at).Take(1)).ThenInclude(m => m.Sender)  
+                .ApplyPaginationAsync(1, 10); // Only get the latest message of each group chat
+
+            return await groupChats;
         }
     }
 }

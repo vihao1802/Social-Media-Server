@@ -40,20 +40,17 @@ namespace SocialMediaServer.Repositories.Implementations
                         ?? throw new AppError("Group not found", 404);
             var filterParams = new Dictionary<string, object?>
             {
-                {"Id", grMessQueryDTO.Id},
-                {"Content", grMessQueryDTO.Content },
-                {"MediaContent", grMessQueryDTO.MediaContent },
-                {"GroupId", grMessQueryDTO.GroupId },
-                {"ReplyToId", grMessQueryDTO.ReplyToId }
+                {"GroupId", grMessQueryDTO.GroupId }
             };
 
             var grMessenges = _dbContext.GroupMessenges
                           .Include(c => c.Replies)
                           .Include(c => c.ReplyTo)
+                          .Include(c => c.Reactions)
+                          .Include(c => c.Sender)
                           .Where(x => x.GroupChatId == idGroup);
-
+            Console.WriteLine(grMessenges.Count());
             var grMessQuery = grMessenges
-                .ApplyFilters(filterParams)
                 .ApplySorting(grMessQueryDTO.Sort)
                 .ApplyPaginationAsync(grMessQueryDTO.Page, grMessQueryDTO.PageSize);
 
@@ -76,6 +73,19 @@ namespace SocialMediaServer.Repositories.Implementations
                 return false;
             }
             _dbContext.GroupMessenges.RemoveRange(grMessenges);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RecallAsync(int grMessId)
+        {
+            var groupMessenge = await _dbContext.GroupMessenges.FirstOrDefaultAsync(p => p.Id == grMessId);
+            if (groupMessenge == null)
+            {
+                return false;
+            }
+            groupMessenge.isDelete = true;
+            _dbContext.GroupMessenges.Update(groupMessenge);
             await _dbContext.SaveChangesAsync();
             return true;
         }

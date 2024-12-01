@@ -8,6 +8,7 @@ namespace SocialMediaServer.Services.Interfaces
     {
         Task<PaginatedResult<PostResponseDTO>> GetAllAsync(PostQueryDTO postQueryDTO);
         Task<PaginatedResult<PostResponseDTO>> GetAllByUserIdAsync(string userViewId, PostQueryDTO postQueryDTO);
+        Task<List<PostResponseDTO>> GetAllStoryFriendAsync(PostQueryDTO postQueryDTO);
         Task<PaginatedResult<PostResponseDTO>> GetAllByMeAsync(PostQueryDTO postQueryDTO);
         Task<PostResponseDTO> GetByIdAsync(int id);
         Task<PostResponseDTO> CreateAsync(PostCreateDTO postCreateDTO);

@@ -10,8 +10,7 @@ namespace SocialMediaServer.DTOs.Request.GroupChat
     {
         [Required]
         public string name {get; set;} = string.Empty;
-        [Required]
-        public string avatar {get; set;} = string.Empty;
+        public string? avatar {get; set;} = string.Empty;
         [Required]
         public string AdminId {get; set;} = string.Empty;
     }

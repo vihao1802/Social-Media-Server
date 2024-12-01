@@ -29,7 +29,7 @@ namespace SocialMediaServer.Repositories.Implementations
 
             var postViewers = _dbContext.PostViewers
                 .Where(postViewer => postViewer.PostId == postId);
-                
+
             foreach (var postViewer in postViewers)
             {
                 postViewer.Post = _dbContext.Posts.FirstOrDefault(p => p.Id == postViewer.PostId);
@@ -59,7 +59,7 @@ namespace SocialMediaServer.Repositories.Implementations
             postViewer.User = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == postViewer.UserId);
 
             return postViewer;
-                
+
         }
 
         public async Task<bool> DeleteByIdAsync(int id)

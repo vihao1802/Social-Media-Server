@@ -7,6 +7,5 @@ namespace SocialMediaServer.DTOs.Request.GroupChat
         public string? Group_avt { get; set; }
         public string? Created_at { get; set; }
         public string? AdminId {get; set;}
-        public string? Includes {get; set;}
     }
 }

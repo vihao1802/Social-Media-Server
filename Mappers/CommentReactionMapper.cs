@@ -23,8 +23,8 @@ namespace SocialMediaServer.Mappers
             return new CommentReactionResponseDTO
             {
                 Id = commentReaction.Id,
-                Comment = comment,
-                User = user,
+                commentId = comment.Id,
+                userId = user.Id,
                 Reaction_at = commentReaction.Reaction_at,
             };
         }

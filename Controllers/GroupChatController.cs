@@ -13,16 +13,26 @@ namespace SocialMediaServer.Controllers
     public class GroupChatController : ControllerBase
     {
         private readonly IGroupChatService _groupChatService;
+        private readonly IUserService _userService ;
 
-        public GroupChatController(IGroupChatService groupChatService)
+        public GroupChatController(IGroupChatService groupChatService,IUserService userService)
         {
             _groupChatService = groupChatService;
+            _userService = userService;
         }
 
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllGroupChats([FromQuery] GroupChatQueryDTO groupChatQueryDTO)
         {
             var groupChats = await _groupChatService.GetAllAsync(groupChatQueryDTO);
+            return Ok(groupChats);
+        }
+
+        [HttpGet("me/get-all")]
+        public async Task<IActionResult> GetAllByUsers([FromQuery] GroupChatQueryDTO groupChatQueryDTO)
+        {
+            var userClaims = await _userService.GetCurrentUser(User);
+            var groupChats = await _groupChatService.GetAllByUserAsync(groupChatQueryDTO,userClaims.Id.ToString());
             return Ok(groupChats);
         }
 
@@ -41,14 +51,14 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateGroupChat([FromBody] GroupChatCreateDTO groupChatCreateDTO)
+        public async Task<IActionResult> CreateGroupChat([FromForm] GroupChatCreateDTO groupChatCreateDTO,IFormFile? mediaFile)
         {
-            var createdGroupChat = await _groupChatService.CreateAsync(groupChatCreateDTO);
+            var createdGroupChat = await _groupChatService.CreateAsync(groupChatCreateDTO, mediaFile);
             return CreatedAtAction(nameof(GetGroupChatById), new { groupChatId = createdGroupChat.Id }, createdGroupChat);
         }
 
         [HttpPut("Update/{groupChatId}")]
-        public async Task<IActionResult> UpdateGroupChat([FromBody] UpdateGrChatDTO groupChatUpdateDTO, int groupChatId)
+        public async Task<IActionResult> UpdateGroupChat([FromForm] UpdateGrChatDTO groupChatUpdateDTO, int groupChatId)
         {
             try
             {
@@ -62,7 +72,6 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpPut("TransferAdmin/{groupChatId}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TransferAdmin(int groupChatId, [FromBody] TransferAdminDTO transferAdminDTO)
         {
             try
@@ -83,6 +92,20 @@ namespace SocialMediaServer.Controllers
             try
             {
                 await _groupChatService.DeleteAsync(groupChatId);
+                return NoContent();
+            }
+            catch (AppError ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpDelete("Disband/{groupChatId}")]
+        public async Task<IActionResult> DisbandGroupChat(int groupChatId)
+        {
+            try
+            {
+                await _groupChatService.DeleteGrAsync(groupChatId);
                 return NoContent();
             }
             catch (AppError ex)

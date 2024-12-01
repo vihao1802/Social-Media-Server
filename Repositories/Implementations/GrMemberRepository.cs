@@ -55,7 +55,7 @@ public class GroupMemberRepository : IGroupMemberRepository
                 .ApplyFilters(filterParams)
                 .ApplySorting(grMemberQueryDTO.Sort)
                 .ApplyPaginationAsync(grMemberQueryDTO.Page, grMemberQueryDTO.PageSize);
-
+            
             return await grMembersQuery;
     }
 
@@ -118,7 +118,7 @@ public class GroupMemberRepository : IGroupMemberRepository
     public async Task<GroupMember> GetByIdAsync(int id)
     {
         var grMember = await _dbContext.GroupMembers.FirstOrDefaultAsync(p => p.Id == id)
-                ?? throw new AppError("Comment not found", 404);
+                ?? throw new AppError("Member not found", 404);
             
         return grMember;
     }
@@ -127,6 +127,18 @@ public class GroupMemberRepository : IGroupMemberRepository
     {
         _dbContext.GroupMembers.Update(grMember);
         await _dbContext.SaveChangesAsync();
+        return grMember;
+    }
+
+    public async Task<bool> IsMemberOfGroupAsync(int groupChatId, string userId)
+    {
+        return await _dbContext.GroupMembers
+            .AnyAsync(grMember => grMember.GroupChatId == groupChatId && grMember.UserId == userId && !grMember.isDelete && !grMember.isLeft);
+    }
+
+    public async Task<GroupMember?> GetByGroupAndUser(int groupChatId, string userId)
+    {
+        var grMember = await _dbContext.GroupMembers.FirstOrDefaultAsync(p => p.GroupChatId == groupChatId && p.UserId == userId);
         return grMember;
     }
 }

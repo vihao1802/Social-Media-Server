@@ -134,5 +134,31 @@ namespace SocialMediaServer.Controllers
             return NoContent();
 
         }
+
+        [HttpGet("me/personal-messenger")]
+        public async Task<IActionResult> GetCurrentUserPersonalMessenger()
+        {
+            var userClaims = await _userService.GetCurrentUser(User);
+
+            var list_following = await _relationshipService.GetCurrentUserPersonalMessenger(userClaims.Id.ToString());
+
+            return Ok(list_following);
+
+        }
+
+        [HttpGet("{user_id}/following/get-quantity")]
+        public async Task<IActionResult> GetFollowingQuantity([FromRoute] string user_id)
+        {
+            var quantity = await _relationshipService.GetFollowingQuantity(user_id);
+            return Ok(new { quantity });
+        }   
+
+        [HttpGet("{user_id}/follower/get-quantity")]
+        public async Task<IActionResult> GetFollowerQuantity([FromRoute] string user_id)
+        {
+            var quantity = await _relationshipService.GetFollowerQuantity(user_id);
+
+            return Ok(new { quantity });
+        }
     }
 }

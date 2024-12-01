@@ -11,5 +11,6 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<GroupMessenge> GetByIdAsync(int id);
         Task<bool> DeleteAllByGroupIdAsync(int grMessId);
+        Task<bool> RecallAsync(int grMessId);
     }
 }

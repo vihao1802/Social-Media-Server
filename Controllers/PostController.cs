@@ -8,7 +8,7 @@ namespace SocialMediaServer.Controllers
 {
 
     [ApiController]
-    [Authorize]
+    // [Authorize]
     [Route("api/post/")]
 
     public class PostController(IPostService postService) : ControllerBase
@@ -33,6 +33,13 @@ namespace SocialMediaServer.Controllers
         public async Task<IActionResult> GetAllPostByUserId(string user_id, [FromQuery] PostQueryDTO postQueryDTO)
         {
             var posts = await _postService.GetAllByUserIdAsync(user_id, postQueryDTO);
+            return Ok(posts);
+        }
+
+        [HttpGet("stories")]
+        public async Task<IActionResult> GetAllStoryFriend([FromQuery] PostQueryDTO postQueryDTO)
+        {
+            var posts = await _postService.GetAllStoryFriendAsync(postQueryDTO);
             return Ok(posts);
         }
 

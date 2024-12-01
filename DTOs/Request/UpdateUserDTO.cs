@@ -31,7 +31,7 @@ namespace SocialMediaServer.DTOs.Request
         public string Profile_img { get; set; }
 
         [Required(ErrorMessage = "PhoneNumber is required")]
-        [RegularExpression(@"^?[0-9]\d{10}$", ErrorMessage = "Invalid phone number format.")]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Invalid phone number format.")]
         public string PhoneNumber { get; set; }
     }
 }

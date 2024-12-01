@@ -13,6 +13,7 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<PaginatedResult<GroupMember>> GetAllAsync(GroupMemberQueryDTO grMemberQueryDTO);
         Task<bool> DeleteAsync(int id);
         Task<GroupMember> CreateAsync(GroupMember grMember);
-        
+        Task<bool> IsMemberOfGroupAsync(int groupChatId, string userId);
+        Task<GroupMember> GetByGroupAndUser(int groupChatId, string userId);
     }
 }

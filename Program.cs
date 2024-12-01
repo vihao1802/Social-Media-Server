@@ -26,6 +26,18 @@ using Microsoft.AspNetCore.Authentication.Facebook;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                      });
+});
 // Load environment variables from .env file
 Env.Load();
 
@@ -201,6 +213,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IMessengeRepository, MessengeRepository>();
+builder.Services.AddScoped<IMessengeService, MessengeService>();
+builder.Services.AddScoped<IMessengeMediaContent, MessengeMediaContentRepository>();
+builder.Services.AddScoped<IWebSocketService, WebSocketService>();
+
+
+
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
@@ -213,6 +232,15 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentReactionRepository, CommentReactionRepository>();
 builder.Services.AddScoped<ICommentReactionService, CommentReactionService>();
+builder.Services.AddScoped<IMessengeFileService, MessengeFileService>();
+builder.Services.AddScoped<IGroupChatRepository, GroupChatRepository>();
+builder.Services.AddScoped<IGroupChatService, GroupChatService>();
+builder.Services.AddScoped<IGroupMemberRepository, GroupMemberRepository>();
+builder.Services.AddScoped<IGroupMemberService, GroupMemberService>();
+builder.Services.AddScoped<IGroupMessengeRepository, GroupMessengeRepository>();
+builder.Services.AddScoped<IGroupMessengeService, GroupMessengeService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IMessageReactionRepository, MessageReactionRepository>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
@@ -233,6 +261,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
@@ -243,6 +273,27 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+// Enable WebSocket middleware
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+app.UseWebSockets(webSocketOptions);
+
+// Map WebSocket requests
+app.Map("/ws/messenge", async context =>
+{
+    if (context.WebSockets.IsWebSocketRequest)
+    {
+        var webSocketService = context.RequestServices.GetRequiredService<IWebSocketService>();
+        var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+        await webSocketService.HandleWebSocketConnectionAsync(webSocket);
+    }
+    else
+    {
+        context.Response.StatusCode = 400; // Bad Request
+    }
+});
 
 app.MapControllers();
 
