@@ -58,14 +58,12 @@ namespace SocialMediaServer.Services.Implementations
         {
             if (principal != null)
             {
-                var user = await _userRepository.GetUserByClaimPrincipal(principal);
-                return user?.UserToUserResponseDTO() ?? throw new AppError("Unauthorized !", 401);
+                var user = await _userRepository.GetUserByClaimPrincipal(principal) ?? throw new AppError("Unauthorized !", 401);
+                return user.UserToUserResponseDTO();
             }
 
             throw new AppError("User not found", 404);
         }
-
-
 
         public async Task<UserResponseDTO?> GetUserByUsername(string username)
         {

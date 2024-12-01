@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -57,30 +60,60 @@ namespace SocialMediaServer.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var login_result = await _AuthService.Login(loginDto);
-            if (login_result == null)
-            {
-                return BadRequest("User not exist !");
-            }
-            else if (login_result == Microsoft.AspNetCore.Identity.SignInResult.LockedOut)
-            {
-                return StatusCode(403, "User is locked out !");
-            }
-            else if (login_result.Succeeded)
-            {
-                var new_user = await _userService.GetUserByEmail(loginDto.Email);
-                return Ok(new LoginResponseDTO
-                {
-                    Email = loginDto.Email,
-                    Token = _tokenService.CreateToken(new_user)
-                });
-            }
-            else
-            {
-                return BadRequest("Invalid email or password !");
-            }
 
+            await _AuthService.Login(loginDto);
+            var new_user = await _userService.GetUserByEmail(loginDto.Email);
+
+            return Ok(new LoginResponseDTO
+            {
+                Email = loginDto.Email,
+                Token = _tokenService.CreateToken(new_user)
+            });
         }
+
+        [HttpGet("external-login/Google")]
+        public IActionResult ExternalLoginGoogle(string returnUrl = "/api")
+        {
+            // Cấu hình URL để chuyển hướng sau khi xác thực thành công
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
+
+            // Cấu hình các thuộc tính xác thực
+            var properties = _AuthService.ExternalLoginConfig("Google", redirectUrl);
+
+            // Chuyển hướng đến nhà cung cấp để bắt đầu xác thực
+            return Challenge(properties, "Google");
+        }
+
+        [HttpGet("external-login/Facebook")]
+        public IActionResult ExternalLoginFacebook(string returnUrl = "/api")
+        {
+            // Cấu hình URL để chuyển hướng sau khi xác thực thành công
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
+
+            // Cấu hình các thuộc tính xác thực
+            var properties = _AuthService.ExternalLoginConfig("Facebook", redirectUrl);
+
+            // Chuyển hướng đến nhà cung cấp để bắt đầu xác thực
+            return Challenge(properties, "Facebook");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("external-login-callback")]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
+        {
+            // login
+            AuthenticateResult info = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var claimsIdentity = info?.Principal?.Identity as ClaimsIdentity ?? throw new AppError("External login failed: Missing claims", 400);
+
+            LoginResponseDTO loginResponseDTO = await _AuthService.HandleExternalAuthentication(claimsIdentity);
+
+            string clientDomain = Environment.GetEnvironmentVariable("CLIENT_DOMAIN") ?? throw new ArgumentException("Front end URL not found");
+
+            return Redirect($"{clientDomain}{returnUrl}?token={loginResponseDTO.Token}&email={loginResponseDTO.Email}");
+        }
+
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
