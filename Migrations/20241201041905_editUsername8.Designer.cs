@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaServer.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241201041905_editUsername8")]
+    partial class editUsername8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "10260b32-eb72-48df-93f2-0c9882dcaea0",
+                            Id = "cb35c9f0-3ec7-44d3-a21b-f2a96c311a3b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ea31344e-cac3-4bfb-803d-0e2835360704",
+                            Id = "481d19ad-3f9c-4de7-8ace-eb240d5a58ab",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -594,7 +597,9 @@ namespace SocialMediaServer.Migrations
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
-                        .HasDatabaseName("UserNameIndex");
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.HasIndex("UserName");
 

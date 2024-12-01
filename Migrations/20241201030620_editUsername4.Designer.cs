@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaServer.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241201030620_editUsername4")]
+    partial class editUsername4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "10260b32-eb72-48df-93f2-0c9882dcaea0",
+                            Id = "ac69ba1b-c1eb-446a-9a47-48ff04ae87f9",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ea31344e-cac3-4bfb-803d-0e2835360704",
+                            Id = "85ecd463-f286-404e-9f46-28b8b77873ff",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -594,9 +597,13 @@ namespace SocialMediaServer.Migrations
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
-                        .HasDatabaseName("UserNameIndex");
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("UserName");
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });

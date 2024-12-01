@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMediaServer.Data;
 
@@ -11,9 +12,11 @@ using SocialMediaServer.Data;
 namespace SocialMediaServer.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241201040223_editUsername6")]
+    partial class editUsername6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace SocialMediaServer.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "10260b32-eb72-48df-93f2-0c9882dcaea0",
+                            Id = "943e6e7f-3bdb-4223-bb85-991b602df24c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ea31344e-cac3-4bfb-803d-0e2835360704",
+                            Id = "a93606b2-4ec1-4e50-a221-3545ad09c92a",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -595,8 +598,6 @@ namespace SocialMediaServer.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .HasDatabaseName("UserNameIndex");
-
-                    b.HasIndex("UserName");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });

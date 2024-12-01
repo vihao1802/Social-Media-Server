@@ -14,9 +14,11 @@ namespace SocialMediaServer.Models
         public DateTime? Date_of_birth { get; set; }
 
         public string? PhoneNumber { get; set; }
-        public bool Gender { get; set; } = true;
+        public string Gender { get; set; } = GenderOptions.Male.ToString();
         public DateTime Create_at { get; set; } = DateTime.Now;
         public bool Is_disabled { get; set; } = false;
+
+        public bool Is_external_user { get; set; } = false;
         public List<Relationship> SentRelationships { get; set; } = new List<Relationship>();
         public List<Relationship> ReceivedRelationships { get; set; } = new List<Relationship>();
         public List<Post> Posts { get; set; } = new List<Post>();
@@ -30,5 +32,11 @@ namespace SocialMediaServer.Models
 
         public List<Messenge> MessengeSent { get; set; } = new List<Messenge>();
         public List<Messenge> MessengeReceived { get; set; } = new List<Messenge>();
+    }
+
+    public enum GenderOptions
+    {
+        Male,
+        Female
     }
 }

@@ -31,8 +31,18 @@ public class ApplicationDBContext : IdentityDbContext<User>
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<User>()
         .Property(e => e.Gender)
+        .HasColumnType("varchar(50)"); // Hoặc "varchar(50)" tùy thuộc vào DBMS
+
+        modelBuilder.Entity<User>()
+        .Property(e => e.Is_external_user)
         .HasConversion<Byte>()
         .HasColumnType("TINYINT");
+
+        modelBuilder.Entity<User>()
+        .HasIndex(e => e.NormalizedUserName).IsUnique(false);
+
+        modelBuilder.Entity<User>()
+        .HasIndex(e => e.UserName).IsUnique(false);
 
         modelBuilder.Entity<PostViewer>()
         .Property(e => e.Liked)

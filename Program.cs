@@ -17,6 +17,12 @@ using SocialMediaServer.Utils;
 using CloudinaryDotNet;
 using DotNetEnv;
 using SocialMediaServer.Configuration;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Facebook;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,10 +42,22 @@ var cloudinarySettings = new CloudinarySettings
 // Register Cloudinary as a singleton service
 var cloudinaryAccount = new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret);
 var cloudinary = new Cloudinary(cloudinaryAccount);
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
+                      });
+});
+
+
 builder.Services.AddSingleton(cloudinary);
-
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
@@ -54,7 +72,7 @@ builder.Services.AddIdentity<User, IdentityRole>(Options =>
     Options.Password.RequireUppercase = true;
     Options.Password.RequireNonAlphanumeric = true;
     Options.Password.RequiredLength = 8;
-
+    Options.User.AllowedUserNameCharacters = null; // allow all charater including VIE format
     Options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(365 * 100);  // Lockout time duration
     Options.Lockout.AllowedForNewUsers = true;
 
@@ -64,13 +82,100 @@ builder.Services.AddIdentity<User, IdentityRole>(Options =>
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme =
-    options.DefaultChallengeScheme =
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
     options.DefaultForbidScheme =
     options.DefaultScheme =
-    options.DefaultSignInScheme =
     options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    // Cấu hình Cookie Authentication (chỉ cho Google Auth)
+    options.LoginPath = "/api/auth/external-login/Google";
+    options.LogoutPath = "/logout";
+})
+.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+{
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value ?? throw new ArgumentException("Google ClientId is missing.");
+    options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value ?? throw new ArgumentException("Google ClientSecret is missing.");
+    // Yêu cầu thêm thông tin trong scope
+
+
+    options.Scope.Add("email"); // Lấy ngày sinh
+    options.Scope.Add("profile"); // Lấy ngày sinh
+    options.Scope.Add("https://www.googleapis.com/auth/userinfo.profile"); // Lấy ngày sinh
+    options.Scope.Add("https://www.googleapis.com/auth/userinfo.email"); // Lấy ngày sinh
+    options.Scope.Add("https://www.googleapis.com/auth/user.birthday.read"); // Lấy ngày sinh
+    options.Scope.Add("https://www.googleapis.com/auth/user.gender.read");
+
+    // Lấy ảnh đại diện
+    // Xử lý sự kiện khi xác thực thành công
+    options.Events.OnCreatingTicket = async context =>
+    {
+        // Gọi API của Google để lấy thêm thông tin người dùng
+        var userInfoEndpoint = "https://people.googleapis.com/v1/people/me?personFields=emailAddresses,names,birthdays,genders,photos";
+        var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, userInfoEndpoint);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+        var response = await context.Backchannel.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+            var user = JsonSerializer.Deserialize<JsonElement>(json);
+
+            // TODO: xem coi authenticate xong nó có trả về email với name không, nếu không thì add claim thủ công
+            // hoàn thành việc đăng kí và đăng nhập google TRONG HÔM NAY
+            // hoàn thành thêm việc đăng kí và đăng nhập bằng facebook
+
+
+            // Thêm claims tùy chỉnh
+            var picture = user.GetProperty("photos")[0].GetProperty("url").GetString(); // Lấy ảnh đại diện
+            var gender = user.GetProperty("genders")[0].GetProperty("value").GetString(); // Lấy giới tính
+            var day = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("day").GetInt32().ToString(); // Lấy ngày sinh
+            var month = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("month").GetInt32().ToString(); // Lấy ngày sinh
+            var year = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("year").GetInt32().ToString(); // Lấy ngày sinh
+            var birthday = $"{day}/{month}/{year}";
+
+            context.Identity.AddClaim(new Claim("picture", picture ?? ""));
+            context.Identity.AddClaim(new Claim("gender", gender ?? ""));
+            context.Identity.AddClaim(new Claim("birthday", birthday ?? ""));
+        }
+    };
+
+})
+.AddFacebook(FacebookDefaults.AuthenticationScheme, options =>
+{
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.AppId = builder.Configuration.GetSection("FackbookKeys:AppId").Value ?? throw new ArgumentException("Facebook AppId is missing.");
+    options.AppSecret = builder.Configuration.GetSection("FackbookKeys:AppSecret").Value ?? throw new ArgumentException("Facebook AppSecret is missing.");
+    options.Scope.Add("email");
+    options.Scope.Add("user_birthday");
+    options.Scope.Add("user_gender");
+    options.Events.OnCreatingTicket = async context =>
+    {
+        // Gọi API của Facebook để lấy thêm thông tin người dùng
+        var userInfoEndpoint = "https://graph.facebook.com/v11.0/me?fields=id,name,email,birthday,gender";
+        var request = new HttpRequestMessage(System.Net.Http.HttpMethod.Get, userInfoEndpoint);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
+        var response = await context.Backchannel.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+            var user = JsonSerializer.Deserialize<JsonElement>(json);
+
+            // Thêm claims tùy chỉnh
+            var picture = $"https://graph.facebook.com/{user.GetProperty("id").GetString()}/picture?type=large"; // Lấy ảnh đại diện
+            var birthday = user.GetProperty("birthday").GetString(); // Lấy ngày sinh
+            var gender = user.GetProperty("gender").GetString(); // Lấy giới tính
+
+            context.Identity.AddClaim(new Claim("picture", picture ?? ""));
+            context.Identity.AddClaim(new Claim("birthday", birthday ?? ""));
+            context.Identity.AddClaim(new Claim("gender", gender ?? ""));
+
+        }
+    };
+})
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -84,6 +189,8 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+
+
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformationService>();
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -129,6 +236,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 

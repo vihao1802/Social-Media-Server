@@ -22,7 +22,7 @@ namespace SocialMediaServer.DTOs.Request
         public DateTime Date_of_birth { get; set; }
 
         [Required]
-        public bool Gender { get; set; }
+        public string Gender { get; set; }
 
 
         [Required(ErrorMessage = "Bio is required")]
