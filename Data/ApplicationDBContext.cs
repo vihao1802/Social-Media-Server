@@ -170,19 +170,19 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 .HasForeignKey(n => n.GroupId) // Khóa ngoại
                 .OnDelete(DeleteBehavior.Cascade); // Khi xóa nhóm thì xóa thông báo
 
-        List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
-            };
-        modelBuilder.Entity<IdentityRole>().HasData(roles);
+        // List<IdentityRole> roles = new List<IdentityRole>
+        //     {
+        //         new IdentityRole
+        //         {
+        //             Name = "Admin",
+        //             NormalizedName = "ADMIN"
+        //         },
+        //         new IdentityRole
+        //         {
+        //             Name = "User",
+        //             NormalizedName = "USER"
+        //         },
+        //     };
+        // modelBuilder.Entity<IdentityRole>().HasData(roles);
     }
 }

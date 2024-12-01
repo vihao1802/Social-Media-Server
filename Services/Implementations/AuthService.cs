@@ -173,10 +173,6 @@ namespace SocialMediaServer.Services.Implementations
             if (user != null)
                 throw new AppError("Email existed", 400);
 
-            var user_by_username = await _UserRepository.GetUserByUsername(registerDTO.UserName);
-            if (user_by_username != null)
-                throw new AppError("Username existed", 400);
-
             var newUser = new User
             {
                 UserName = registerDTO.UserName,
