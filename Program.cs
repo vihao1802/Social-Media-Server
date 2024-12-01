@@ -238,6 +238,22 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
+// seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDBContext>();
+        DbInitializer.SeedFromSql(context, "Data/initData.sql");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -280,6 +296,5 @@ app.Map("/ws/messenge", async context =>
 });
 
 app.MapControllers();
-
 
 app.Run();
