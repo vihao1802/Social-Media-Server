@@ -55,19 +55,6 @@ var cloudinarySettings = new CloudinarySettings
 var cloudinaryAccount = new Account(cloudinarySettings.CloudName, cloudinarySettings.ApiKey, cloudinarySettings.ApiSecret);
 var cloudinary = new Cloudinary(cloudinaryAccount);
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("http://localhost:3000")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod()
-                                .AllowCredentials();
-                      });
-});
-
 
 builder.Services.AddSingleton(cloudinary);
 builder.Services.AddEndpointsApiExplorer();
@@ -135,17 +122,14 @@ builder.Services.AddAuthentication(options =>
             var json = await response.Content.ReadAsStringAsync();
             var user = JsonSerializer.Deserialize<JsonElement>(json);
 
-            // TODO: xem coi authenticate xong nó có trả về email với name không, nếu không thì add claim thủ công
-            // hoàn thành việc đăng kí và đăng nhập google TRONG HÔM NAY
-            // hoàn thành thêm việc đăng kí và đăng nhập bằng facebook
-
-
             // Thêm claims tùy chỉnh
-            var picture = user.GetProperty("photos")[0].GetProperty("url").GetString(); // Lấy ảnh đại diện
-            var gender = user.GetProperty("genders")[0].GetProperty("value").GetString(); // Lấy giới tính
-            var day = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("day").GetInt32().ToString(); // Lấy ngày sinh
-            var month = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("month").GetInt32().ToString(); // Lấy ngày sinh
-            var year = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("year").GetInt32().ToString(); // Lấy ngày sinh
+            var picture = user.GetProperty("photos")[0].GetProperty("url").GetString() ?? throw new AppError("Insufficent infomation: photo is required", 400); // Lấy ảnh đại diện
+
+            var gender = user.GetProperty("genders")[0].GetProperty("value").GetString() ?? throw new AppError("Insufficent infomation: gender is required", 400); // Lấy giới tính
+
+            var day = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("day").GetInt32().ToString() ?? throw new AppError("Insufficent infomation: birthday is required", 400); // Lấy ngày sinh
+            var month = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("month").GetInt32().ToString() ?? throw new AppError("Insufficent infomation: birthday is required", 400); // Lấy ngày sinh
+            var year = user.GetProperty("birthdays")[0].GetProperty("date").GetProperty("year").GetInt32().ToString() ?? throw new AppError("Insufficent infomation: birthday is required", 400); // Lấy ngày sinh
             var birthday = $"{day}/{month}/{year}";
 
             context.Identity.AddClaim(new Claim("picture", picture ?? ""));
@@ -158,8 +142,8 @@ builder.Services.AddAuthentication(options =>
 .AddFacebook(FacebookDefaults.AuthenticationScheme, options =>
 {
     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.AppId = builder.Configuration.GetSection("FackbookKeys:AppId").Value ?? throw new ArgumentException("Facebook AppId is missing.");
-    options.AppSecret = builder.Configuration.GetSection("FackbookKeys:AppSecret").Value ?? throw new ArgumentException("Facebook AppSecret is missing.");
+    options.AppId = builder.Configuration.GetSection("FacebookKeys:AppId").Value ?? throw new ArgumentException("Facebook AppId is missing.");
+    options.AppSecret = builder.Configuration.GetSection("FacebookKeys:AppSecret").Value ?? throw new ArgumentException("Facebook AppSecret is missing.");
     options.Scope.Add("email");
     options.Scope.Add("user_birthday");
     options.Scope.Add("user_gender");
