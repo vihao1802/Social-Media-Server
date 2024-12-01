@@ -61,8 +61,9 @@ namespace SocialMediaServer.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _AuthService.Login(loginDto);
             var new_user = await _userService.GetUserByEmail(loginDto.Email);
+
+            await _AuthService.Login(loginDto);
 
             return Ok(new LoginResponseDTO
             {
