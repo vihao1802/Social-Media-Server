@@ -88,13 +88,13 @@ namespace SocialMediaServer.Services.Implementations
         {
             var user = await _userRepository.GetUserById(userId);
 
-            var check_unique_email = await GetUserByEmail(updateUserDTO.Email);
+            /* var check_unique_email = await GetUserByEmail(updateUserDTO.Email);
             if (check_unique_email != null && !check_unique_email.Id.Equals(userId))
                 throw new AppError("Email already exists!", 400);
 
             var check_unique_username = await GetUserByUsername(updateUserDTO.Username);
             if (check_unique_username != null && !check_unique_username.Id.Equals(userId))
-                throw new AppError("Username already exists!", 400);
+                throw new AppError("Username already exists!", 400); */
 
             user.UserName = updateUserDTO.Username;
             user.Email = updateUserDTO.Email;
