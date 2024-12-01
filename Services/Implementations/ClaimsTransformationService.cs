@@ -24,22 +24,28 @@ namespace SocialMediaServer.Services.Implementations
                 throw new AppError("User is not authenticated", 401);
             }
 
-            var user = await _userService.GetCurrentUser(principal);
-
-            var roles = await _userRepository.GetUsersRoles(user.ToUserFromUserResponseDTO());
-
-            if (roles.Count == 0)
+            try
             {
-                return principal;
-            }
+                var user = await _userService.GetCurrentUser(principal);
+                var roles = await _userRepository.GetUsersRoles(user.ToUserFromUserResponseDTO());
 
-            foreach (var role in roles)
-            {
-                if (principal.HasClaim(ClaimTypes.Role, role))
+                if (roles.Count == 0)
                 {
-                    continue;
+                    return principal;
                 }
-                ((ClaimsIdentity)principal.Identity).AddClaim(new Claim(ClaimTypes.Role, role));
+
+                foreach (var role in roles)
+                {
+                    if (principal.HasClaim(ClaimTypes.Role, role))
+                    {
+                        continue;
+                    }
+                    ((ClaimsIdentity)principal.Identity).AddClaim(new Claim(ClaimTypes.Role, role));
+                }
+            }
+            catch (Exception ex)
+            { // chưa đăng ký 
+
             }
 
             return principal;

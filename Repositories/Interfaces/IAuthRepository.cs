@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using SocialMediaServer.DTOs;
 using SocialMediaServer.Models;
@@ -20,5 +21,10 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<IdentityResult> ValidatePassword(User user, string newPassword);
 
         Task<IdentityResult> UpdatePassword(User user, string currentPassword, string newPassword);
+        AuthenticationProperties ExternalLoginConfig(string provider, string redirectUrl);
+        Task<ExternalLoginInfo?> GetExternalLoginInfo();
+
+        Task<SignInResult> ExternalLoginAsync(ExternalLoginInfo info);
+        Task<IdentityResult> AddRoleToUser(User user, string role);
     }
 }

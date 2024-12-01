@@ -17,7 +17,8 @@ public static class UserMappers
             Profile_img = user.Profile_img,
             Date_of_birth = (DateTime)user.Date_of_birth,
             Gender = user.Gender,
-            PhoneNumber = user.PhoneNumber
+            PhoneNumber = user.PhoneNumber,
+            ExternalUser = user.Is_external_user
         };
     }
 
