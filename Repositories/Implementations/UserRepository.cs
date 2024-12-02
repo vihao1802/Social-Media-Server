@@ -77,7 +77,5 @@ namespace SocialMediaServer.Repositories.Implementations
 
             return roles;
         }
-
-
     }
 }

@@ -19,7 +19,5 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<IdentityResult> UnLockUser(User user);
         Task<IList<string>> GetUsersRoles(User user);
 
-
-
     }
 }
