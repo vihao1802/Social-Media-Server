@@ -28,7 +28,7 @@ namespace SocialMediaServer.DTOs.Request
         [Required(ErrorMessage = "Bio is required")]
         public string Bio { get; set; }
         // [Required(ErrorMessage = "Profile image is required")]
-        public string Profile_img { get; set; }
+        public string? Profile_img { get; set; }
 
         [Required(ErrorMessage = "PhoneNumber is required")]
         [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Invalid phone number format.")]
