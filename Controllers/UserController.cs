@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaServer.DTOs.Request;
 using SocialMediaServer.ExceptionHandling;
@@ -41,8 +42,8 @@ namespace SocialMediaServer.Controllers
             return Ok(current_user);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser(UpdateUserDTO updateUserDTO)
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdateUserInfo(UpdateUserDTO updateUserDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -53,7 +54,18 @@ namespace SocialMediaServer.Controllers
 
             return NoContent();
         }
+        [HttpPatch("update/avatar")]
+        public async Task<IActionResult> UpdateAvatar(IFormFile newAvatarFile)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var current_user = await _userService.GetCurrentUser(User);
+
+            await _userService.UpdateUserAvatar(current_user.Id, newAvatarFile);
+
+            return NoContent();
+        }
 
         [HttpDelete("/lock/{user_id}")]
         [Authorize(Roles = "Admin")]
@@ -68,6 +80,7 @@ namespace SocialMediaServer.Controllers
             else
                 return NoContent();
         }
+
         [HttpPut("/unlock/{user_id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UnlockUser(string user_id)
