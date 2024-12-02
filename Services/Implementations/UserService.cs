@@ -93,7 +93,6 @@ namespace SocialMediaServer.Services.Implementations
             if (check_unique_email != null && !check_unique_email.Id.Equals(userId))
                 throw new AppError("Email already exists!", 400);
 
-
             user.UserName = updateUserDTO.Username;
             user.Email = updateUserDTO.Email;
             user.PhoneNumber = updateUserDTO.PhoneNumber;

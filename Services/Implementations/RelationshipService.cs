@@ -180,7 +180,7 @@ namespace SocialMediaServer.Services.Implementations
                 list_personal_messenger.Add(messengerDto);
             }
 
-            return list_personal_messenger;
+            return list_personal_messenger.OrderByDescending(m => m.Message_created_at).ToList();
         }
 
         public async Task<int> GetFollowingQuantity(string user_id)
