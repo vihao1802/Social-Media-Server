@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -123,6 +126,50 @@ namespace SocialMediaServer.Repositories.Implementations
             .CountAsync();
 
             return quantity;
+        }
+
+        // SELECT u.Id, u.UserName, COUNT(r1.ReceiverId) AS MutualFriends
+        // FROM AspNetUsers u
+        // JOIN Relationships r1 ON u.Id = r1.ReceiverId
+        // JOIN Relationships r2 ON r1.SenderId= r2.ReceiverId
+        // WHERE r2.SenderId = '51304637-5F13-44D1-B06B-8C406EC5FA01'
+        //   AND u.Id NOT IN (
+        //       SELECT ReceiverId FROM Relationships WHERE SenderId = '51304637-5F13-44D1-B06B-8C406EC5FA01'
+        //   )
+        // GROUP BY u.Id, u.UserName
+        // ORDER BY MutualFriends DESC
+
+
+        public async Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string userId, RecommendationQueryDTO recommendationQueryDTO)
+        {
+
+            // Lấy danh sách ReceiverId đã được SenderId gửi yêu cầu
+            var excludedIds = _dbContext.Relationships
+                .Where(r => r.SenderId == userId)
+                .Select(r => r.ReceiverId);
+
+            // Truy vấn chính
+            var recommendations = _userManager.Users
+                .Where(u => !excludedIds.Contains(u.Id)) // Loại trừ những người đã có quan hệ
+                .Select(u => new RecommendationResponseDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    MutualFriends = _dbContext.Relationships
+                        .Where(r1 => r1.ReceiverId == u.Id)
+                        .Join(_dbContext.Relationships,
+                            r1 => r1.SenderId,
+                            r2 => r2.ReceiverId,
+                            (r1, r2) => r2) // Join Relationships r1 với r2
+                        .Count(r2 => r2.SenderId == userId) // Đếm số bạn chung
+                })
+                .OrderByDescending(x => x.MutualFriends);
+
+
+            var recommendationQuery = recommendations
+                .ApplyPaginationAsync(recommendationQueryDTO.Page, recommendationQueryDTO.PageSize);
+
+            return await recommendationQuery;
         }
     }
 }
