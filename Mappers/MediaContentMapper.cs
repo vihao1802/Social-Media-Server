@@ -15,7 +15,6 @@ namespace SocialMediaServer.Mappers
 
             var post = mediaContent.Post != null ? mediaContent.Post.PostToPostResponseDTO()
                                                   : new PostResponseDTO { Id = mediaContent.PostId };
-
             return new MediaContentResponseDTO
             {
                 Id = mediaContent.Id,
