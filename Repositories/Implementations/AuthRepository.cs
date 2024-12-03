@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc.Routing;
+using SocialMediaServer.Data;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
 
@@ -12,6 +13,7 @@ namespace SocialMediaServer.Repositories.Implementations
     public class AuthRepository : IAuthRepository
     {
         private readonly UserManager<User> _userManager;
+
         private readonly SignInManager<User> _signInManager;
         public AuthRepository(UserManager<User> userManager, SignInManager<User> signInManager)
         {

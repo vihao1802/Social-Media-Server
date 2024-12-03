@@ -8,7 +8,6 @@ public enum RelationshipType
 
 public enum RelationshipStatus
 {
-    Rejected,
     Pending,
     Accepted,
 }

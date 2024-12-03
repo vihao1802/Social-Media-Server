@@ -36,7 +36,7 @@ namespace SocialMediaServer.Services.Implementations
             if (get_existed != null)
             {
                 get_existed.Relationship_type = RelationshipType.Block;
-                await _relationshipRepository.ChangeRelationshipType(get_existed);
+                await _relationshipRepository.UpdateRelationship(get_existed);
             }
 
             var relation = new Relationship
@@ -79,7 +79,7 @@ namespace SocialMediaServer.Services.Implementations
                     return;
 
                 get_existed.Relationship_type = RelationshipType.Follow;
-                await _relationshipRepository.ChangeRelationshipType(get_existed);
+                await _relationshipRepository.UpdateRelationship(get_existed);
             }
 
             var relation = new Relationship
@@ -183,22 +183,44 @@ namespace SocialMediaServer.Services.Implementations
             return list_personal_messenger.OrderByDescending(m => m.Message_created_at).ToList();
         }
 
-        public async Task<int> GetFollowingQuantity(string user_id)
+        public async Task<int> GetNumberOfFollowing(string user_id)
         {
             var check_user = await _userService.GetUserById(user_id) ?? throw new AppError("User not found", 404);
 
-            var quantity = await _relationshipRepository.GetFollowingQuantity(user_id);
+            var quantity = await _relationshipRepository.GetNumberOfFollowing(user_id);
 
             return quantity;
         }
 
-        public async Task<int> GetFollowerQuantity(string user_id)
+        public async Task<int> GetNumberOfFollower(string user_id)
         {
             var check_user = await _userService.GetUserById(user_id) ?? throw new AppError("User not found", 404);
 
-            var quantity = await _relationshipRepository.GetFollowerQuantity(user_id);
+            var quantity = await _relationshipRepository.GetNumberOfFollower(user_id);
 
             return quantity;
+        }
+
+        public async Task AcceptUserFollowRequest(string sender_id, string request_id)
+        {
+            Relationship relationship = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(request_id, sender_id) ?? throw new AppError("Request not found", 404);
+
+            if (relationship.Status == RelationshipStatus.Accepted) return;
+
+            if (relationship.Relationship_type == RelationshipType.Block) throw new AppError($"Accept failed: You have been blocked by user {request_id}", 400);
+
+            relationship.Status = RelationshipStatus.Accepted;
+
+            await _relationshipRepository.UpdateRelationship(relationship);
+        }
+        public async Task RejectUserFollowRequest(string sender_id, string request_id)
+        {
+            Relationship relationship = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(request_id, sender_id) ?? throw new AppError("Request not found", 404);
+
+            if (relationship.Status == RelationshipStatus.Accepted) throw new AppError("Request has been accepted", 400);
+            if (relationship.Relationship_type == RelationshipType.Block) throw new AppError($"Accept failed: You have been blocked by user {request_id}", 400);
+
+            await _relationshipRepository.DeleteRelationship(relationship);
         }
     }
 }
