@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using SocialMediaServer.Models;
 
 namespace SocialMediaServer.DTOs
 {
     public class RegisterDTO
     {
+        public string? Id { get; set; }
         [Required(ErrorMessage = "Username is required")]
         public required string UserName { get; set; }
 
@@ -23,10 +25,12 @@ namespace SocialMediaServer.DTOs
     ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")]
         public required string Password { get; set; }
 
-        public bool Gender { get; set; } = true;
+        public required string Gender { get; set; } = GenderOptions.Male.ToString();
 
 
         [Required(ErrorMessage = "Date of birth is required")]
-        public DateTime Date_of_birth { get; set; }
+        public required DateTime Date_of_birth { get; set; }
+
+        public string? Profile_img { get; set; }
     }
 }

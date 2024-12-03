@@ -1,5 +1,6 @@
 
 using System.Security.Policy;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -89,6 +90,29 @@ namespace SocialMediaServer.Repositories.Implementations
         {
             var check_result = await _userManager.IsLockedOutAsync(user);
             return check_result;
+        }
+
+
+        public AuthenticationProperties ExternalLoginConfig(string provider, string redirectUrl)
+        {
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return properties;
+        }
+
+        public async Task<ExternalLoginInfo?> GetExternalLoginInfo()
+        {
+            return await _signInManager.GetExternalLoginInfoAsync();
+            // return await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        public async Task<SignInResult> ExternalLoginAsync(ExternalLoginInfo info)
+        {
+            return await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+        }
+
+        public async Task<IdentityResult> AddRoleToUser(User user, string role)
+        {
+            return await _userManager.AddToRoleAsync(user, role);
         }
     }
 }

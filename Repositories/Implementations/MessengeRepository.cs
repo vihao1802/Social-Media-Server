@@ -23,11 +23,23 @@ namespace SocialMediaServer.Repositories.Implementations
             var messenges = await _context.Messenges
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
+            .Include(m => m.MediaContents) 
             .Where(m => m.RelationshipId == relationshipId)
             .OrderBy(m => m.Sent_at)
             .ToListAsync();
 
             return messenges;
+        }
+
+        public async Task<Messenge> GetLatestMessageByRelationshipIdAsync(int relationshipId){
+            var message = await _context.Messenges
+            .Include(m => m.Sender)
+            .Include(m => m.Receiver)
+            .Where(m => m.RelationshipId == relationshipId)
+            .OrderByDescending(m => m.Sent_at)
+            .FirstOrDefaultAsync();
+
+            return message;
         }
 
         public async Task<Messenge> SendMessengeAsync(Messenge newMessenge){

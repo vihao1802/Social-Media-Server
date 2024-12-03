@@ -87,26 +87,16 @@ namespace SocialMediaServer.Repositories.Implementations
                 .ToListAsync();
         }
 
-        public async Task<PaginatedResult<GroupChat>> GetAllByUserAsync(GroupChatQueryDTO postQueryDTO, string userId)
+        public async Task<PaginatedResult<GroupChat>> GetAllByUserAsync(string userId)
         {
-            var filterParams = new Dictionary<string, object?>
-            {
-                {"Id", postQueryDTO.Id},
-                {"Group_name", postQueryDTO.Group_name},
-                {"Group_avt", postQueryDTO.Group_avt},
-                {"Created_at", postQueryDTO.Created_at}
-            };
-
+            
             var groupChats = _dbContext.Groups
-                .Where(g => g.isDelete == false && g.Members.Any(m => m.UserId == userId)); // Only include non-deleted groups where the user is a member
+                .Include(g => g.Members)
+                .Where(g => g.isDelete == false && g.Members.Any(m => m.UserId == userId)) // Only include non-deleted groups where the user is a  member
+                .Include(g => g.Messages.OrderByDescending(m => m.Sent_at).Take(1)).ThenInclude(m => m.Sender)  
+                .ApplyPaginationAsync(1, 10); // Only get the latest message of each group chat
 
-            var groupChatsQuery = groupChats
-                .ApplyIncludes(postQueryDTO.Includes)          
-                .ApplyFilters(filterParams) 
-                .ApplySorting(postQueryDTO.Sort)
-                .ApplyPaginationAsync(postQueryDTO.Page, postQueryDTO.PageSize);
-
-            return await groupChatsQuery;
+            return await groupChats;
         }
     }
 }

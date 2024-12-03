@@ -7,6 +7,7 @@ using SocialMediaServer.Models;
 using SocialMediaServer.Services.Interfaces;
 using System.Security.Claims;
 using SocialMediaServer.ExceptionHandling;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace SocialMediaServer.Services.Implementations
 {
@@ -15,10 +16,12 @@ namespace SocialMediaServer.Services.Implementations
         private readonly IUserRepository _userRepository;
 
         private readonly IAuthRepository _authRepository;
-        public UserService(IUserRepository userRepository, IAuthRepository authRepository)
+        private readonly IMediaService _mediaService;
+        public UserService(IUserRepository userRepository, IAuthRepository authRepository, IMediaService mediaService)
         {
             _userRepository = userRepository;
             _authRepository = authRepository;
+            _mediaService = mediaService;
         }
 
         public async Task<IdentityResult?> LockUser(string id)
@@ -58,14 +61,12 @@ namespace SocialMediaServer.Services.Implementations
         {
             if (principal != null)
             {
-                var user = await _userRepository.GetUserByClaimPrincipal(principal);
-                return user?.UserToUserResponseDTO() ?? throw new AppError("Unauthorized !", 401);
+                var user = await _userRepository.GetUserByClaimPrincipal(principal) ?? throw new AppError("Unauthorized !", 401);
+                return user.UserToUserResponseDTO();
             }
 
             throw new AppError("User not found", 404);
         }
-
-
 
         public async Task<UserResponseDTO?> GetUserByUsername(string username)
         {
@@ -86,27 +87,33 @@ namespace SocialMediaServer.Services.Implementations
 
         public async Task UpdateUserInformation(string userId, UpdateUserDTO updateUserDTO)
         {
-            var user = await _userRepository.GetUserById(userId);
+            var user = await _userRepository.GetUserById(userId) ?? throw new AppError("User not found", 404);
 
             var check_unique_email = await GetUserByEmail(updateUserDTO.Email);
             if (check_unique_email != null && !check_unique_email.Id.Equals(userId))
                 throw new AppError("Email already exists!", 400);
-
-            var check_unique_username = await GetUserByUsername(updateUserDTO.Username);
-            if (check_unique_username != null && !check_unique_username.Id.Equals(userId))
-                throw new AppError("Username already exists!", 400);
 
             user.UserName = updateUserDTO.Username;
             user.Email = updateUserDTO.Email;
             user.PhoneNumber = updateUserDTO.PhoneNumber;
             user.Bio = updateUserDTO.Bio;
             user.Date_of_birth = updateUserDTO.Date_of_birth;
-            user.Profile_img = updateUserDTO.Profile_img;
             user.Gender = updateUserDTO.Gender;
 
             await _userRepository.UpdateUserInformation(user);
 
             return;
+        }
+
+        public async Task UpdateUserAvatar(string userId, IFormFile file)
+        {
+            var user = await _userRepository.GetUserById(userId) ?? throw new AppError("User not found", 404);
+
+            var profile_img = await _mediaService.UploadMediaAsync(file, "SocialMediaProfileImages");
+
+            user.Profile_img = profile_img;
+
+            await _userRepository.UpdateUserInformation(user);
         }
     }
 }

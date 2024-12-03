@@ -27,6 +27,6 @@ namespace SocialMediaServer.Services.Interfaces
         Task<IdentityResult> LockUser(string id);
         Task<IdentityResult> UnLockUser(string id);
 
-
+        Task UpdateUserAvatar(string userId, IFormFile file);
     }
 }

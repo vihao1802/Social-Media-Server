@@ -22,13 +22,13 @@ namespace SocialMediaServer.DTOs.Request
         public DateTime Date_of_birth { get; set; }
 
         [Required]
-        public bool Gender { get; set; }
+        public string Gender { get; set; }
 
 
         [Required(ErrorMessage = "Bio is required")]
         public string Bio { get; set; }
-        [Required(ErrorMessage = "Profile image is required")]
-        public string Profile_img { get; set; }
+        // [Required(ErrorMessage = "Profile image is required")]
+        public string? Profile_img { get; set; }
 
         [Required(ErrorMessage = "PhoneNumber is required")]
         [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Invalid phone number format.")]

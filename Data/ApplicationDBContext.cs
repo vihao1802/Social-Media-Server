@@ -34,8 +34,18 @@ public class ApplicationDBContext : IdentityDbContext<User>
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<User>()
         .Property(e => e.Gender)
+        .HasColumnType("varchar(50)"); // Hoặc "varchar(50)" tùy thuộc vào DBMS
+
+        modelBuilder.Entity<User>()
+        .Property(e => e.Is_external_user)
         .HasConversion<Byte>()
         .HasColumnType("TINYINT");
+
+        modelBuilder.Entity<User>()
+        .HasIndex(e => e.NormalizedUserName).IsUnique(false);
+
+        modelBuilder.Entity<User>()
+        .HasIndex(e => e.UserName).IsUnique(false);
 
         modelBuilder.Entity<PostViewer>()
         .Property(e => e.Liked)
@@ -160,19 +170,19 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 .HasForeignKey(n => n.GroupId) // Khóa ngoại
                 .OnDelete(DeleteBehavior.Cascade); // Khi xóa nhóm thì xóa thông báo
 
-        List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
-            };
-        modelBuilder.Entity<IdentityRole>().HasData(roles);
+        // List<IdentityRole> roles = new List<IdentityRole>
+        //     {
+        //         new IdentityRole
+        //         {
+        //             Name = "Admin",
+        //             NormalizedName = "ADMIN"
+        //         },
+        //         new IdentityRole
+        //         {
+        //             Name = "User",
+        //             NormalizedName = "USER"
+        //         },
+        //     };
+        // modelBuilder.Entity<IdentityRole>().HasData(roles);
     }
 }

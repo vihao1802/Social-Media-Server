@@ -13,6 +13,6 @@ namespace SocialMediaServer.Services.Interfaces
         Task<List<MessengeResponseDTO>> GetMessagesByRelationshipIdAsync(int relationshipId);
         Task SendMessengeAsync(string senderId, int relationshipId, int? replytoId ,string? content, List<string>? filesName);
         Task DeleteMessengeAsync(string senderId, int messengeId);
-
+        Task<MessengeResponseDTO?> GetLatestMessageByRelationshipIdAsync(int relationshipId);
     }
 }
