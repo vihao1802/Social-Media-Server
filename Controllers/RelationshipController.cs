@@ -39,8 +39,8 @@ namespace SocialMediaServer.Controllers
             return Ok(list_following);
         }
 
-        [HttpPost("following")]
-        public async Task<IActionResult> FollowUser([FromBody] string user_id)
+        [HttpPost("follow/{user_id}")]
+        public async Task<IActionResult> FollowUser([FromRoute] string user_id)
         {
 
             var senderClaims = await _userService.GetCurrentUser(User);
@@ -54,7 +54,32 @@ namespace SocialMediaServer.Controllers
             await _relationshipService.FollowUser(senderClaims.Id.ToString(), user_id);
 
             return CreatedAtAction("FollowUser", new { user_id }, "Followed user successfully.");
+        }
 
+        [HttpPost("follow/{request_id}/accept")]
+        public async Task<IActionResult> AcceptUserFollowRequest([FromRoute] string request_id)
+        {
+            var senderClaims = await _userService.GetCurrentUser(User);
+
+            if (request_id == null)
+                return BadRequest("Receiver id is required.");
+
+            await _relationshipService.AcceptUserFollowRequest(senderClaims.Id.ToString(), request_id);
+
+            return NoContent();
+        }
+
+        [HttpPost("follow/{request_id}/reject")]
+        public async Task<IActionResult> RejectUserFollowRequest([FromRoute] string request_id)
+        {
+            var senderClaims = await _userService.GetCurrentUser(User);
+
+            if (request_id == null)
+                return BadRequest("Receiver id is required.");
+
+            await _relationshipService.RejectUserFollowRequest(senderClaims.Id.ToString(), request_id);
+
+            return NoContent();
         }
 
         [HttpPost("{user_id}/unfollow")]
@@ -149,14 +174,14 @@ namespace SocialMediaServer.Controllers
         [HttpGet("{user_id}/following/get-quantity")]
         public async Task<IActionResult> GetFollowingQuantity([FromRoute] string user_id)
         {
-            var quantity = await _relationshipService.GetFollowingQuantity(user_id);
+            var quantity = await _relationshipService.GetNumberOfFollowing(user_id);
             return Ok(new { quantity });
-        }   
+        }
 
         [HttpGet("{user_id}/follower/get-quantity")]
         public async Task<IActionResult> GetFollowerQuantity([FromRoute] string user_id)
         {
-            var quantity = await _relationshipService.GetFollowerQuantity(user_id);
+            var quantity = await _relationshipService.GetNumberOfFollower(user_id);
 
             return Ok(new { quantity });
         }

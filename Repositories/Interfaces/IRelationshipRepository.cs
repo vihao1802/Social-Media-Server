@@ -15,12 +15,12 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<Relationship> CreateRelationship(Relationship relationship);
         Task DeleteRelationship(Relationship relationship);
         Task<Relationship> GetRelationshipBetweenSenderAndReceiver(string sender_id, string receiver_id);
-        Task ChangeRelationshipType(Relationship r);
+        Task UpdateRelationship(Relationship r);
 
 
         // Sử dụng cho messenge
         Task<Relationship> GetRelationshipById(int relationShipId);
-        Task<int> GetFollowingQuantity(string user_id);
-        Task<int> GetFollowerQuantity(string user_id);
+        Task<int> GetNumberOfFollowing(string user_id);
+        Task<int> GetNumberOfFollower(string user_id);
     }
 }
