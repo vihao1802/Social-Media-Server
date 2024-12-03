@@ -5,8 +5,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SocialMediaServer.DTOs.Request.User;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -76,6 +78,26 @@ namespace SocialMediaServer.Repositories.Implementations
             IList<string> roles = await _userManager.GetRolesAsync(user);
 
             return roles;
+        }
+
+        public async Task<PaginatedResult<User>> SearchForUser(UserQueryDTO userQueryDTO)
+        {
+            var filterParams = new Dictionary<string, object?>
+                    {
+                        {"Email", userQueryDTO.Email},
+                        {"UserName", userQueryDTO.Username },
+                    };
+
+            var users = _userManager.Users
+                .Where(user => user.Is_disabled == false);
+
+            var userQuery = users
+                .ApplyIncludes(userQueryDTO.Includes)
+                .ApplyFilters(filterParams)
+                .ApplySorting(userQueryDTO.Sort)
+                .ApplyPaginationAsync(userQueryDTO.Page, userQueryDTO.PageSize);
+
+            return await userQuery;
         }
     }
 }
