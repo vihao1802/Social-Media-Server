@@ -173,9 +173,10 @@ namespace SocialMediaServer.Services.Implementations
             if (user != null)
                 throw new AppError("Email existed", 400);
 
+            string postFix = Generator.GenerateRandomString(8);
             var newUser = new User
             {
-                UserName = registerDTO.UserName,
+                UserName = $"{registerDTO.UserName}@{postFix}",
                 Email = registerDTO.Email,
                 Date_of_birth = registerDTO.Date_of_birth,
                 Gender = registerDTO.Gender,

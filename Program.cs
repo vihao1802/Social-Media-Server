@@ -244,6 +244,11 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
+// builder.Services.AddHttpsRedirection(options =>
+// {
+//     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+//     options.HttpsPort = 5001;
+// });
 
 var app = builder.Build();
 
