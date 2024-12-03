@@ -82,12 +82,12 @@ namespace SocialMediaServer.Repositories.Implementations
             return block_list;
         }
 
-        public async Task ChangeRelationshipType(Relationship r)
+        public async Task UpdateRelationship(Relationship r)
         {
             _dbContext.Relationships.Update(r);
             await _dbContext.SaveChangesAsync();
-
         }
+
         public async Task<Relationship> CreateRelationship(Relationship relationship)
         {
             var r = await _dbContext.Relationships.AddAsync(relationship);
@@ -96,16 +96,19 @@ namespace SocialMediaServer.Repositories.Implementations
         }
 
 
-        public async Task<Relationship> GetRelationshipById(int relationshipId){
-            var r = await _dbContext.Relationships.FindAsync(relationshipId); 
-            if (r == null){
+        public async Task<Relationship> GetRelationshipById(int relationshipId)
+        {
+            var r = await _dbContext.Relationships.FindAsync(relationshipId);
+            if (r == null)
+            {
                 return null;
             }
 
             return r;
         }
 
-        public async Task<int> GetFollowingQuantity(string user_id){
+        public async Task<int> GetNumberOfFollowing(string user_id)
+        {
             var quantity = await _dbContext.Relationships
             .Where(r => r.Sender.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
             .CountAsync();
@@ -113,7 +116,8 @@ namespace SocialMediaServer.Repositories.Implementations
             return quantity;
         }
 
-        public async Task<int> GetFollowerQuantity(string user_id){
+        public async Task<int> GetNumberOfFollower(string user_id)
+        {
             var quantity = await _dbContext.Relationships
             .Where(r => r.Receiver.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
             .CountAsync();
