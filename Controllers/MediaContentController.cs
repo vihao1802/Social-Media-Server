@@ -43,7 +43,7 @@ namespace SocialMediaServer.Controllers
                 return NotFound(ex.Message);
             }
         }
-          
+
         [HttpPost]
         public async Task<IActionResult> CreateAsync(
             [FromForm] MediaContentCreateDTO mediaContentCreateDTO, IFormFile mediaFile)
@@ -51,13 +51,13 @@ namespace SocialMediaServer.Controllers
             var createdMediaContent = await _mediaContentService.CreateAsync(
                 mediaContentCreateDTO, mediaFile);
 
-            return CreatedAtAction(nameof(GetById), 
+            return CreatedAtAction(nameof(GetById),
                 new { mediaContent_id = createdMediaContent.Id }, createdMediaContent);
         }
 
         [HttpPut("{mediaContent_id}")]
         public async Task<IActionResult> UpdateAsync(
-            [FromForm] MediaContentUpdateDTO mediaContentUpdateDTO, int mediaContent_id, 
+            [FromForm] MediaContentUpdateDTO mediaContentUpdateDTO, int mediaContent_id,
             IFormFile mediaFile)
         {
             try
@@ -74,7 +74,7 @@ namespace SocialMediaServer.Controllers
 
         [HttpPatch("{mediaContent_id}")]
         public async Task<IActionResult> PatchAsync(
-            [FromForm] MediaContentPatchDTO mediaContentPatchDTO, int mediaContent_id, 
+            [FromForm] MediaContentPatchDTO mediaContentPatchDTO, int mediaContent_id,
             IFormFile? mediaFile)
         {
             try

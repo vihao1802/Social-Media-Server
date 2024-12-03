@@ -99,7 +99,7 @@ namespace SocialMediaServer.Services.Implementations
                 {
                     // Kiểm tra quan hệ bạn bè hai chiều (mutual follow)
                     var relationshipUserView_User = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(userLogin, user.ReceiverId);
-                    
+
 
                     if (relationshipUserView_User?.Relationship_type == RelationshipType.Follow)
                     {
@@ -142,12 +142,12 @@ namespace SocialMediaServer.Services.Implementations
             }
             else
                 if (relationshipUserView_User?.Relationship_type == RelationshipType.Block ||
-                    relationshipUser_UserView.Relationship_type == RelationshipType.Block)
+                    relationshipUser_UserView?.Relationship_type == RelationshipType.Block)
             {
                 throw new AppError("You are not authorized to see this content", 401);
             }
             else
-                if (relationshipUser_UserView.Relationship_type == RelationshipType.Follow &&
+                if (relationshipUser_UserView?.Relationship_type == RelationshipType.Follow &&
                     relationshipUserView_User?.Relationship_type == RelationshipType.Follow)
             {
                 posts = await _postRepository.GetAllPostsOnlyFriendByUserIdAsync(userViewId, postQueryDTO);
