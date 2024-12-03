@@ -39,8 +39,8 @@ namespace SocialMediaServer.Controllers
             return Ok(list_following);
         }
 
-        [HttpPost("following")]
-        public async Task<IActionResult> FollowUser([FromBody] string user_id)
+        [HttpPost("follow/{user_id}")]
+        public async Task<IActionResult> FollowUser([FromRoute] string user_id)
         {
 
             var senderClaims = await _userService.GetCurrentUser(User);
