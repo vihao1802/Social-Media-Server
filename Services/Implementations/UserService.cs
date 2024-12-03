@@ -8,6 +8,8 @@ using SocialMediaServer.Services.Interfaces;
 using System.Security.Claims;
 using SocialMediaServer.ExceptionHandling;
 using Microsoft.AspNetCore.JsonPatch;
+using SocialMediaServer.Utils;
+using SocialMediaServer.DTOs.Request.User;
 
 namespace SocialMediaServer.Services.Implementations
 {
@@ -80,25 +82,23 @@ namespace SocialMediaServer.Services.Implementations
             return user?.UserToUserResponseDTO();
         }
 
-        public Task<List<UserResponseDTO>> SearchForUsers(string search_string)
+        public async Task<PaginatedResult<UserResponseDTO>> SearchForUser(UserQueryDTO userQueryDTO)
         {
-            throw new NotImplementedException();
+            var users = await _userRepository.SearchForUser(userQueryDTO);
+
+            var ListUsersDto = users.Items.Select(user => user.UserToUserResponseDTO()).ToList();
+
+            return new PaginatedResult<UserResponseDTO>(ListUsersDto, users.TotalItems, users.PageSize, users.Page);
         }
 
         public async Task UpdateUserInformation(string userId, UpdateUserDTO updateUserDTO)
         {
             var user = await _userRepository.GetUserById(userId) ?? throw new AppError("User not found", 404);
 
-            var check_unique_email = await GetUserByEmail(updateUserDTO.Email);
-            if (check_unique_email != null && !check_unique_email.Id.Equals(userId))
-                throw new AppError("Email already exists!", 400);
-
-            user.UserName = updateUserDTO.Username;
-            user.Email = updateUserDTO.Email;
             user.PhoneNumber = updateUserDTO.PhoneNumber;
             user.Bio = updateUserDTO.Bio;
             user.Date_of_birth = updateUserDTO.Date_of_birth;
-            user.Gender = updateUserDTO.Gender;
+            user.Gender = updateUserDTO.Gender != null ? updateUserDTO.Gender : user.Gender;
 
             await _userRepository.UpdateUserInformation(user);
 

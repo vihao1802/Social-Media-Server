@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Request.User;
 using SocialMediaServer.ExceptionHandling;
 using SocialMediaServer.Services.Interfaces;
 namespace SocialMediaServer.Controllers
@@ -40,6 +41,12 @@ namespace SocialMediaServer.Controllers
             var current_user = await _userService.GetCurrentUser(User);
 
             return Ok(current_user);
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchForUsers([FromQuery] UserQueryDTO userQueryDTO)
+        {
+            var users = await _userService.SearchForUser(userQueryDTO);
+            return Ok(users);
         }
 
         [HttpPatch("update")]
