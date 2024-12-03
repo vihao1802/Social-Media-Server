@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Interfaces
 {
@@ -22,5 +25,7 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<Relationship> GetRelationshipById(int relationShipId);
         Task<int> GetNumberOfFollowing(string user_id);
         Task<int> GetNumberOfFollower(string user_id);
+
+        Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string userId, RecommendationQueryDTO recommendationQueryDTO);
     }
 }

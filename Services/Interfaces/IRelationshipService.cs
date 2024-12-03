@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using SocialMediaServer.DTOs.Request;
 using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Services.Interfaces
 {
@@ -26,5 +28,7 @@ namespace SocialMediaServer.Services.Interfaces
 
         Task AcceptUserFollowRequest(string sender_id, string request_id);
         Task RejectUserFollowRequest(string sender_id, string request_id);
+
+        Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string userId, RecommendationQueryDTO recommendationQueryDTO);
     }
 }

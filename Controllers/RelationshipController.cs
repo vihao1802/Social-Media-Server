@@ -185,5 +185,14 @@ namespace SocialMediaServer.Controllers
 
             return Ok(new { quantity });
         }
+        [HttpGet("recommendation")]
+        public async Task<IActionResult> GetRecommendation([FromQuery] RecommendationQueryDTO recommendationQueryDTO)
+        {
+            var userClaims = await _userService.GetCurrentUser(User);
+
+            var list_recommendation = await _relationshipService.GetRecommendation(userClaims.Id, recommendationQueryDTO);
+
+            return Ok(list_recommendation);
+        }
     }
 }

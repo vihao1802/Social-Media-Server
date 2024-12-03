@@ -6,6 +6,8 @@ using SocialMediaServer.Mappers;
 using Microsoft.Identity.Client;
 using SocialMediaServer.Models;
 using SocialMediaServer.ExceptionHandling;
+using SocialMediaServer.Utils;
+using SocialMediaServer.DTOs.Request;
 
 namespace SocialMediaServer.Services.Implementations
 {
@@ -221,6 +223,15 @@ namespace SocialMediaServer.Services.Implementations
             if (relationship.Relationship_type == RelationshipType.Block) throw new AppError($"Accept failed: You have been blocked by user {request_id}", 400);
 
             await _relationshipRepository.DeleteRelationship(relationship);
+        }
+
+        public async Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string user_id, RecommendationQueryDTO recommendationQueryDTO)
+        {
+            var user = await _userService.GetUserById(user_id) ?? throw new AppError("User not found", 404);
+
+            var recommendation = await _relationshipRepository.GetRecommendation(user_id, recommendationQueryDTO);
+
+            return recommendation;
         }
     }
 }
