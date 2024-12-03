@@ -59,7 +59,7 @@ namespace SocialMediaServer.Services.Implementations
             var notification = await _notificationRepository.CreateAsync(new Notification{
                 GroupId = createdGroup.Id,
                 Group = createdGroup,
-                Content = user.UserName + " da tao nhom"
+                Content = user.UserName + " created group",
             });
             return createdGroup.GrChatToGrChatResponseDTO();
         }
