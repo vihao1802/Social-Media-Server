@@ -5,8 +5,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Request.User;
 using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Services.Interfaces
 {
@@ -20,7 +22,7 @@ namespace SocialMediaServer.Services.Interfaces
         Task<UserResponseDTO?> GetUserByUsername(string username);
         Task<UserResponseDTO?> GetUserByEmail(string email);
 
-        Task<List<UserResponseDTO>> SearchForUsers(string search_string);
+        Task<PaginatedResult<UserResponseDTO>> SearchForUser(UserQueryDTO userQueryDTO);
 
         Task UpdateUserInformation(string userId, UpdateUserDTO updateUserDTO);
 

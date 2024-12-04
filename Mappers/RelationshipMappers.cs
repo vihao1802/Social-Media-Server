@@ -17,7 +17,7 @@ namespace SocialMediaServer.Mappers
                 ReceiverId = r.ReceiverId,
                 receiver = r.Receiver.UserToUserResponseDTO(),
                 RelationshipType = (Convert.ToByte(r.Relationship_type) == 1) ? "Follow" : "Block",
-                Status = (Convert.ToByte(r.Status) == 2) ? "Accepted" : (Convert.ToByte(r.Status) == 1) ? "Pending" : "Rejected",
+                Status = (Convert.ToByte(r.Status) == 1) ? "Accepted" : "Pending",
                 Create_at = r.Create_at
             };
         }
@@ -30,7 +30,7 @@ namespace SocialMediaServer.Mappers
                 SenderId = r.SenderId,
                 Sender = r.Sender.UserToUserResponseDTO(),
                 RelationshipType = (Convert.ToByte(r.Relationship_type) == 1) ? "Follow" : "Block",
-                Status = (Convert.ToByte(r.Status) == 2) ? "Accepted" : (Convert.ToByte(r.Status) == 1) ? "Pending" : "Rejected",
+                Status = (Convert.ToByte(r.Status) == 1) ? "Accepted" : "Pending",
                 Create_at = r.Create_at
             };
         }

@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Interfaces
 {
@@ -15,12 +18,14 @@ namespace SocialMediaServer.Repositories.Interfaces
         Task<Relationship> CreateRelationship(Relationship relationship);
         Task DeleteRelationship(Relationship relationship);
         Task<Relationship> GetRelationshipBetweenSenderAndReceiver(string sender_id, string receiver_id);
-        Task ChangeRelationshipType(Relationship r);
+        Task UpdateRelationship(Relationship r);
 
 
         // Sử dụng cho messenge
         Task<Relationship> GetRelationshipById(int relationShipId);
-        Task<int> GetFollowingQuantity(string user_id);
-        Task<int> GetFollowerQuantity(string user_id);
+        Task<int> GetNumberOfFollowing(string user_id);
+        Task<int> GetNumberOfFollower(string user_id);
+
+        Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string userId, RecommendationQueryDTO recommendationQueryDTO);
     }
 }

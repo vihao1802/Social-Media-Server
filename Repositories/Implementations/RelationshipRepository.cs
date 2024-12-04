@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialMediaServer.Data;
+using SocialMediaServer.DTOs.Request;
+using SocialMediaServer.DTOs.Response;
 using SocialMediaServer.Models;
 using SocialMediaServer.Repositories.Interfaces;
+using SocialMediaServer.Utils;
 
 namespace SocialMediaServer.Repositories.Implementations
 {
@@ -82,12 +85,12 @@ namespace SocialMediaServer.Repositories.Implementations
             return block_list;
         }
 
-        public async Task ChangeRelationshipType(Relationship r)
+        public async Task UpdateRelationship(Relationship r)
         {
             _dbContext.Relationships.Update(r);
             await _dbContext.SaveChangesAsync();
-
         }
+
         public async Task<Relationship> CreateRelationship(Relationship relationship)
         {
             var r = await _dbContext.Relationships.AddAsync(relationship);
@@ -96,16 +99,19 @@ namespace SocialMediaServer.Repositories.Implementations
         }
 
 
-        public async Task<Relationship> GetRelationshipById(int relationshipId){
-            var r = await _dbContext.Relationships.FindAsync(relationshipId); 
-            if (r == null){
+        public async Task<Relationship> GetRelationshipById(int relationshipId)
+        {
+            var r = await _dbContext.Relationships.FindAsync(relationshipId);
+            if (r == null)
+            {
                 return null;
             }
 
             return r;
         }
 
-        public async Task<int> GetFollowingQuantity(string user_id){
+        public async Task<int> GetNumberOfFollowing(string user_id)
+        {
             var quantity = await _dbContext.Relationships
             .Where(r => r.Sender.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
             .CountAsync();
@@ -113,12 +119,58 @@ namespace SocialMediaServer.Repositories.Implementations
             return quantity;
         }
 
-        public async Task<int> GetFollowerQuantity(string user_id){
+        public async Task<int> GetNumberOfFollower(string user_id)
+        {
             var quantity = await _dbContext.Relationships
             .Where(r => r.Receiver.Id.Equals(user_id) && r.Relationship_type == RelationshipType.Follow && r.Status == RelationshipStatus.Accepted)
             .CountAsync();
 
             return quantity;
+        }
+
+        // SELECT u.Id, u.UserName, COUNT(r1.ReceiverId) AS MutualFriends
+        // FROM AspNetUsers u
+        // JOIN Relationships r1 ON u.Id = r1.ReceiverId
+        // JOIN Relationships r2 ON r1.SenderId= r2.ReceiverId
+        // WHERE r2.SenderId = '51304637-5F13-44D1-B06B-8C406EC5FA01'
+        //   AND u.Id NOT IN (
+        //       SELECT ReceiverId FROM Relationships WHERE SenderId = '51304637-5F13-44D1-B06B-8C406EC5FA01'
+        //   )
+        // GROUP BY u.Id, u.UserName
+        // ORDER BY MutualFriends DESC
+
+
+        public async Task<PaginatedResult<RecommendationResponseDTO>> GetRecommendation(string userId, RecommendationQueryDTO recommendationQueryDTO)
+        {
+
+            // Lấy danh sách ReceiverId đã được SenderId gửi yêu cầu
+            var excludedIds = _dbContext.Relationships
+                .Where(r => r.SenderId == userId || r.ReceiverId == userId)
+                .Select(r => r.SenderId == userId ? r.ReceiverId : r.SenderId);
+
+            // Truy vấn chính
+            var recommendations = _userManager.Users
+                .Where(u => !excludedIds.Contains(u.Id) && u.Id != userId) // Loại trừ những người đã có quan hệ và chính userId
+                .Select(u => new RecommendationResponseDTO
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    Profile_img = u.Profile_img,
+                    MutualFriends = _dbContext.Relationships
+                        .Where(r1 => r1.ReceiverId == u.Id)
+                        .Join(_dbContext.Relationships,
+                            r1 => r1.SenderId,
+                            r2 => r2.ReceiverId,
+                            (r1, r2) => r2) // Join Relationships r1 với r2
+                        .Count(r2 => r2.SenderId == userId) // Đếm số bạn chung
+                })
+                .OrderByDescending(x => x.MutualFriends);
+
+
+            var recommendationQuery = recommendations
+                .ApplyPaginationAsync(recommendationQueryDTO.Page, recommendationQueryDTO.PageSize);
+
+            return await recommendationQuery;
         }
     }
 }

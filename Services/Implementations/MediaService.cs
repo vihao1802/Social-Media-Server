@@ -8,7 +8,8 @@ namespace SocialMediaServer.Services.Implementations
     public class MediaService : IMediaService
     {
         private readonly Cloudinary _cloudinary;
-        public MediaService(Cloudinary cloudinary) {
+        public MediaService(Cloudinary cloudinary)
+        {
             _cloudinary = cloudinary;
         }
 
@@ -17,7 +18,7 @@ namespace SocialMediaServer.Services.Implementations
             if (!string.IsNullOrEmpty(url))
             {
                 var publicId = GetPublicIdFromUrl(url);
-                var deletionParams = new DeletionParams(folder + "/" +publicId);
+                var deletionParams = new DeletionParams(folder + "/" + publicId);
                 var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
 
                 if (deletionResult.Result != "ok")
@@ -30,20 +31,41 @@ namespace SocialMediaServer.Services.Implementations
         public async Task<string> UploadMediaAsync(IFormFile file, string folder)
         {
             using var stream = file.OpenReadStream();
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(file.FileName, stream),
-                Folder = folder,
-            };
 
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-            if (uploadResult.Error != null)
+            if (file.ContentType.StartsWith("image/"))
             {
-                throw new AppError(uploadResult.Error.Message);
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = folder,
+                };
+                var uploadResult = await _cloudinary.UploadLargeAsync(uploadParams);
+                if (uploadResult.Error != null)
+                {
+                    throw new AppError(uploadResult.Error.Message);
+                }
+
+                return uploadResult.SecureUrl.ToString();
             }
+            else if (file.ContentType.StartsWith("video/"))
+            {
+                var uploadParams = new VideoUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = folder,
+                };
+                var uploadResult = await _cloudinary.UploadLargeAsync(uploadParams);
+                if (uploadResult.Error != null)
+                {
+                    throw new AppError(uploadResult.Error.Message);
+                }
 
-            return uploadResult.SecureUrl.ToString();
+                return uploadResult.SecureUrl.ToString();
+            }
+            else
+            {
+                throw new AppError("Invalid file type.");
+            }
         }
 
         private static string GetPublicIdFromUrl(string url)

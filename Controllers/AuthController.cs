@@ -73,7 +73,7 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpGet("external-login/Google")]
-        public IActionResult ExternalLoginGoogle(string returnUrl = "/api")
+        public IActionResult ExternalLoginGoogle(string returnUrl = "/callback")
         {
             // Cấu hình URL để chuyển hướng sau khi xác thực thành công
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
@@ -86,7 +86,7 @@ namespace SocialMediaServer.Controllers
         }
 
         [HttpGet("external-login/Facebook")]
-        public IActionResult ExternalLoginFacebook(string returnUrl = "/api")
+        public IActionResult ExternalLoginFacebook(string returnUrl = "/callback")
         {
             // Cấu hình URL để chuyển hướng sau khi xác thực thành công
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
@@ -100,7 +100,7 @@ namespace SocialMediaServer.Controllers
 
         [AllowAnonymous]
         [HttpGet("external-login-callback")]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/")
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/callback")
         {
             // login
             AuthenticateResult info = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);

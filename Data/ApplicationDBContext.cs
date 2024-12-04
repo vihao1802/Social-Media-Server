@@ -169,20 +169,5 @@ public class ApplicationDBContext : IdentityDbContext<User>
                 .WithMany(g => g.Notifications) // Một nhóm có nhiều thông báo
                 .HasForeignKey(n => n.GroupId) // Khóa ngoại
                 .OnDelete(DeleteBehavior.Cascade); // Khi xóa nhóm thì xóa thông báo
-
-        // List<IdentityRole> roles = new List<IdentityRole>
-        //     {
-        //         new IdentityRole
-        //         {
-        //             Name = "Admin",
-        //             NormalizedName = "ADMIN"
-        //         },
-        //         new IdentityRole
-        //         {
-        //             Name = "User",
-        //             NormalizedName = "USER"
-        //         },
-        //     };
-        // modelBuilder.Entity<IdentityRole>().HasData(roles);
     }
 }

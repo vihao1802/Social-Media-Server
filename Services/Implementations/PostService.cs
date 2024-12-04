@@ -99,7 +99,7 @@ namespace SocialMediaServer.Services.Implementations
                 {
                     // Kiểm tra quan hệ bạn bè hai chiều (mutual follow)
                     var relationshipUserView_User = await _relationshipRepository.GetRelationshipBetweenSenderAndReceiver(userLogin, user.ReceiverId);
-                    
+
 
                     if (relationshipUserView_User?.Relationship_type == RelationshipType.Follow)
                     {
