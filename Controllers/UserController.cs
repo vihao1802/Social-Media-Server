@@ -19,7 +19,7 @@ namespace SocialMediaServer.Controllers
         private readonly IUserService _userService = userService;
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUser()
         {
             var users = await _userService.GetAllUsers();
