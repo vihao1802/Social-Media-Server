@@ -64,6 +64,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+Console.WriteLine($"Connection String: {builder.Configuration.GetConnectionString("DefaultConnection")}");
 
 builder.Services.AddIdentity<User, IdentityRole>(Options =>
 {

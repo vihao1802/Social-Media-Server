@@ -13,9 +13,16 @@ RUN dotnet publish -c Release -o out
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "Social-Media-Server.dll"]
+
+# Copy the published app from the build environment
+COPY --from=build-env /app/out ./
+
+# Set environment variables (optional but not needed for Render)
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Expose ports
 EXPOSE 80
 EXPOSE 443
+
+# Run the application
+ENTRYPOINT ["dotnet", "Social-Media-Server.dll"]
