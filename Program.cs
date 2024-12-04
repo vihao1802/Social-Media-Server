@@ -245,11 +245,12 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
-// builder.Services.AddHttpsRedirection(options =>
-// {
-//     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-//     options.HttpsPort = 5001;
-// });
+// can be removed
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 443;
+});
 
 var app = builder.Build();
 
@@ -274,8 +275,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else {
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        c.RoutePrefix = string.Empty; // Serve the Swagger UI at the app's root
+    });
 }
-
 
 
 app.UseHttpsRedirection();

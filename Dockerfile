@@ -17,9 +17,6 @@ WORKDIR /app
 # Copy the published app from the build environment
 COPY --from=build-env /app/out ./
 
-# Set environment variables (optional but not needed for Render)
-ENV ASPNETCORE_ENVIRONMENT=Production
-
 # Expose ports
 EXPOSE 80
 EXPOSE 443
