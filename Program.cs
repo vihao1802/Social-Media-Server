@@ -246,11 +246,11 @@ builder.Services.Configure<FormOptions>(options =>
 });
 
 // can be removed
-builder.Services.AddHttpsRedirection(options =>
+/* builder.Services.AddHttpsRedirection(options =>
 {
     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
     options.HttpsPort = 443;
-});
+}); */
 
 var app = builder.Build();
 
