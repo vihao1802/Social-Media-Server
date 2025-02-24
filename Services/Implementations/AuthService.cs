@@ -149,7 +149,7 @@ namespace SocialMediaServer.Services.Implementations
                     Date_of_birth = DateTime.Parse(birthday),
                     Gender = gender,
                     Profile_img = pictureUrl,
-                    Password = $"{Guid.NewGuid()}Aa@1234"
+                    Password = $"{Guid.NewGuid()}@{Generator.GenerateRandomString(8)}",
                 };
                 await RegisterUser(registerDto, true);
 
