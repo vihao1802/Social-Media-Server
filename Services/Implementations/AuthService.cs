@@ -69,7 +69,7 @@ namespace SocialMediaServer.Services.Implementations
             var reset_token = await _AuthRepository.GetPasswordResetToken(user_request);
 
             string clientDomain = Environment.GetEnvironmentVariable("CLIENT_DOMAIN") ?? throw new ArgumentException("Front end URL not found");
-            string url = $"{clientDomain}/api/auth/reset-password?token={reset_token}&email={email}";
+            string url = $"{clientDomain}/password-recovery/reset-password?token={reset_token}&email={email}";
             string email_body = $"Click the link below to reset your password {url}";
 
             try
@@ -149,7 +149,7 @@ namespace SocialMediaServer.Services.Implementations
                     Date_of_birth = DateTime.Parse(birthday),
                     Gender = gender,
                     Profile_img = pictureUrl,
-                    Password = $"{Guid.NewGuid()}Aa@1234"
+                    Password = $"{Guid.NewGuid()}@{Generator.GenerateRandomString(8)}",
                 };
                 await RegisterUser(registerDto, true);
 
