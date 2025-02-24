@@ -93,7 +93,8 @@ builder.Services.AddAuthentication(options =>
 {
     // Cấu hình Cookie Authentication (chỉ cho Google Auth)
     options.LoginPath = "/api/auth/external-login/Google";
-    options.LogoutPath = "/logout";
+    options.LoginPath = "/api/auth/external-login/Facebook";
+    options.LogoutPath = "/api/auth/logout";
 })
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
 {

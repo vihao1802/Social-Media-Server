@@ -150,7 +150,8 @@ namespace SocialMediaServer.Repositories.Implementations
 
             // Truy vấn chính
             var recommendations = _userManager.Users
-                .Where(u => !excludedIds.Contains(u.Id) && u.Id != userId) // Loại trừ những người đã có quan hệ và chính userId
+             .Where(u => u.Id != userId) // Loại trừ chính tài khoản đang đăng nhập
+                .Where(u => !excludedIds.Contains(u.Id)) // Loại trừ những người đã có quan hệ
                 .Select(u => new RecommendationResponseDTO
                 {
                     Id = u.Id,

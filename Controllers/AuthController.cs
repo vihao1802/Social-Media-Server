@@ -61,9 +61,9 @@ namespace SocialMediaServer.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var new_user = await _userService.GetUserByEmail(loginDto.Email);
-
             await _AuthService.Login(loginDto);
+
+            var new_user = await _userService.GetUserByEmail(loginDto.Email);
 
             return Ok(new LoginResponseDTO
             {
@@ -152,6 +152,7 @@ namespace SocialMediaServer.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
         {
+            Console.WriteLine("alooooooooooooooooo controller: ", resetPasswordDto.ResetToken);
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values
