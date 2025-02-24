@@ -59,7 +59,7 @@ namespace SocialMediaServer.Services.Implementations
             var notification = await _notificationRepository.CreateAsync(new Notification{
                 GroupId = createdGroup.Id,
                 Group = createdGroup,
-                Content = user.UserName + " da tao nhom"
+                Content = user.UserName + " created group",
             });
             return createdGroup.GrChatToGrChatResponseDTO();
         }
@@ -174,7 +174,7 @@ namespace SocialMediaServer.Services.Implementations
                 throw new AppError("User not found", 404);
             var grChat = await _grChatRepository.GetAllByUserAsync(userId);
 
-            var listgrChatDto = grChat.Items.Select(grchat => grchat.GrChatToGrChatResponseDTO()).ToList();
+            var listgrChatDto = grChat.Items.OrderByDescending(i => i.Created_at).Select(grchat => grchat.GrChatToGrChatResponseDTO()).ToList();
 
             return new PaginatedResult<GroupChatResponseDTO>(
                 listgrChatDto,

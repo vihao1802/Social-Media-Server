@@ -64,6 +64,7 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+Console.WriteLine($"Connection String: {builder.Configuration.GetConnectionString("DefaultConnection")}");
 
 builder.Services.AddIdentity<User, IdentityRole>(Options =>
 {
@@ -245,11 +246,12 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartHeadersLengthLimit = int.MaxValue;
 });
 
-// builder.Services.AddHttpsRedirection(options =>
-// {
-//     options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-//     options.HttpsPort = 5001;
-// });
+// can be removed
+/* builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 443;
+}); */
 
 var app = builder.Build();
 
@@ -270,13 +272,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

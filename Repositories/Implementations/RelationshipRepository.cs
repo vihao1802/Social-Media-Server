@@ -145,8 +145,8 @@ namespace SocialMediaServer.Repositories.Implementations
 
             // Lấy danh sách ReceiverId đã được SenderId gửi yêu cầu
             var excludedIds = _dbContext.Relationships
-                .Where(r => r.SenderId == userId)
-                .Select(r => r.ReceiverId);
+                .Where(r => r.SenderId == userId || r.ReceiverId == userId)
+                .Select(r => r.SenderId == userId ? r.ReceiverId : r.SenderId);
 
             // Truy vấn chính
             var recommendations = _userManager.Users
@@ -156,6 +156,7 @@ namespace SocialMediaServer.Repositories.Implementations
                 {
                     Id = u.Id,
                     UserName = u.UserName,
+                    Profile_img = u.Profile_img,
                     MutualFriends = _dbContext.Relationships
                         .Where(r1 => r1.ReceiverId == u.Id)
                         .Join(_dbContext.Relationships,

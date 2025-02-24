@@ -111,6 +111,8 @@ namespace SocialMediaServer.Controllers
 
             string clientDomain = Environment.GetEnvironmentVariable("CLIENT_DOMAIN") ?? throw new ArgumentException("Front end URL not found");
 
+            Console.WriteLine($"CLIENT_DOMAIN={clientDomain}");
+
             return Redirect($"{clientDomain}{returnUrl}?token={loginResponseDTO.Token}&email={loginResponseDTO.Email}");
         }
 
